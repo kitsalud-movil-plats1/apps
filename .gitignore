@@ -1,0 +1,25 @@
+# Secretos: nunca se versionan (ver D-17). Usar *.example como plantilla.
+.env
+*.env
+!*.env.example
+secrets/
+*.key
+*.pem
+*.p12
+*.kdbx
+vault-pass*
+
+# Respaldos y artefactos locales
+*.bak
+*.tmp
+*.qcow2
+*.img
+*.iso
+*.zim
+
+# Editor / SO
+.vscode/
+.idea/
+.DS_Store
+*.swp
+__pycache__/

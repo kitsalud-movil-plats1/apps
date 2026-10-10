@@ -1,0 +1,11 @@
+---
+# Ruta del Compose en clinica01 y de los datos (disco de datos, /srv)
+dhis2_dir: /srv/dhis2
+dhis2_db_nombre: dhis2
+dhis2_db_usuario: dhis
+# Usuario con el que corre la imagen dhis2/core (nobody)
+dhis2_uid: 65534
+# started: docker compose up -d; stopped: docker compose down (los datos se conservan)
+dhis2_estado: started
+# Archivos del repositorio apps que se copian tal cual
+dhis2_fuente: "{{ role_path }}/../../../clinica01/dhis2"

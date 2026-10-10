@@ -1,0 +1,57 @@
+# DHIS2 y PostgreSQL/PostGIS en clinica01 (D-06, sección 10.1).
+# Las variables vienen de .env (ver .env.example); los datos quedan en ${DATOS}.
+name: dhis2
+
+services:
+  db:
+    image: postgis/postgis:16-3.5
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    command:
+      - postgres
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - effective_cache_size=1GB
+      - -c
+      - work_mem=16MB
+      - -c
+      - maintenance_work_mem=128MB
+    volumes:
+      - ${DATOS}/postgres:/var/lib/postgresql/data
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  core:
+    image: dhis2/core:2.42.6.0
+    restart: unless-stopped
+    environment:
+      DB_HOSTNAME: db
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JAVA_OPTS: -Xms1g -Xmx2g
+    volumes:
+      - ./dhis.conf:/opt/dhis2/dhis.conf:ro
+      - ${DATOS}/files:/opt/dhis2/files
+    # Solo en la VM; Caddy publica pacientes.salud.movil (apps#2, apps#3)
+    ports:
+      - "127.0.0.1:8080:8080"
+    mem_limit: 4g
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:8080/dhis-web-login/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10m

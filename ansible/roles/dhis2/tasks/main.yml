@@ -1,0 +1,57 @@
+---
+- name: Directorio del Compose y de los datos
+  ansible.builtin.file:
+    path: "{{ dhis2_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Datos de PostgreSQL (los ajusta la imagen al arrancar)
+  ansible.builtin.file:
+    path: "{{ dhis2_dir }}/postgres"
+    state: directory
+    mode: "0700"
+
+- name: Archivos de DHIS2, del usuario de la imagen
+  ansible.builtin.file:
+    path: "{{ dhis2_dir }}/files"
+    state: directory
+    owner: "{{ dhis2_uid }}"
+    group: "{{ dhis2_uid }}"
+    mode: "0750"
+
+- name: Compose y dhis.conf del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ dhis2_fuente }}/{{ item }}"
+    dest: "{{ dhis2_dir }}/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: [compose.yml, dhis.conf]
+  register: dhis2_archivos
+
+- name: Variables y contraseña de la base desde el vault
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ dhis2_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+  register: dhis2_env
+
+- name: Levantar DHIS2
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ dhis2_dir }}"
+  register: dhis2_up
+  changed_when: dhis2_up.stderr is search('Creat|Recreat|Start')
+  when: dhis2_estado == 'started'
+
+- name: Detener DHIS2 (los datos quedan en {{ dhis2_dir }})
+  ansible.builtin.command: docker compose down
+  args:
+    chdir: "{{ dhis2_dir }}"
+  register: dhis2_down
+  changed_when: dhis2_down.stderr is search('Remov|Stop')
+  when: dhis2_estado == 'stopped'

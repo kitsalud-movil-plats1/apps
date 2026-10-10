@@ -1,0 +1,28 @@
+---
+- name: Paquetes de Docker con versión fija
+  ansible.builtin.apt:
+    name: "{{ docker_paquetes | dict2items | map(attribute='key') | zip(docker_paquetes.values()) | map('join', '=') | list }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Retener los paquetes para que una actualización general no los cambie
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ docker_paquetes.keys() | list }}"
+
+- name: Configuración del demonio (rotación de logs)
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reiniciar docker
+
+- name: Docker activo al arrancar
+  ansible.builtin.systemd_service:
+    name: docker
+    enabled: true
+    state: started

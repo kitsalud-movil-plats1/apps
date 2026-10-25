@@ -40,6 +40,15 @@
     mode: "0600"
   register: dhis2_env
 
+- name: pg_hba.conf de PostgreSQL
+  ansible.builtin.template:
+    src: pg_hba.conf.j2
+    dest: "{{ dhis2_dir }}/pg_hba.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  register: dhis2_hba
+
 - name: Levantar DHIS2
   ansible.builtin.command: docker compose up -d
   args:
@@ -55,6 +64,12 @@
   args:
     chdir: "{{ dhis2_dir }}"
   when: dhis2_estado == 'started' and dhis2_archivos is changed and dhis2_up is not changed
+
+- name: Reiniciar PostgreSQL si cambió pg_hba.conf
+  ansible.builtin.command: docker compose restart db
+  args:
+    chdir: "{{ dhis2_dir }}"
+  when: dhis2_estado == 'started' and dhis2_hba is changed and dhis2_up is not changed
 
 - name: Detener DHIS2 (los datos quedan en {{ dhis2_dir }})
   ansible.builtin.command: docker compose down

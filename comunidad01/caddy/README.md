@@ -1,6 +1,6 @@
 # Caddy en comunidad01
 
-Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por nombre y la raíz de la CA del kit. Más adelante publicará el registro por HTTPS (apps#6), firmado por el intermedio de comunidad01 ([`platform/kit01/ca/`](../../../platform/kit01/ca/README.md)).
+Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por nombre y la raíz de la CA del kit. Publica el registro por HTTPS, firmado por el intermedio de comunidad01 ([`platform/kit01/ca/`](../../../platform/kit01/ca/README.md)).
 
 | Archivo | Qué es |
 |---|---|
@@ -11,13 +11,14 @@ Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por no
 | Nombre | Destino | Protocolo |
 |---|---|---|
 | `biblioteca.salud.movil` | Kiwix en `127.0.0.1:8090` | HTTP |
+| `registro.salud.movil` | Formularios en `127.0.0.1:8100` ([`../formularios/`](../formularios/)) | HTTPS (`tls internal`), con `default_sni registro.salud.movil` |
 | `ca.salud.movil` | `/srv/publica` (página y `raiz.crt` con `Content-Type: application/x-x509-ca-cert`) | HTTP |
 
 Caddy usa la red del host para escuchar en IPv4 e IPv6 y ver la IP real del cliente en el log de acceso (`log`, a la salida del contenedor). Los servicios quedan publicados solo en `127.0.0.1`. La API de administración de Caddy escucha solo en `127.0.0.1:2019`.
 
 ## Cómo se despliega
 
-Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible-playbook playbooks/comunidad01.yml`). El rol toma los archivos de `apps/<vm>/caddy/`, deja todo en `/srv/caddy/` (`compose.yml`, `conf/Caddyfile`, `data/` y `config/`), recarga Caddy cuando cambia el Caddyfile y abre en ufw `caddy_puertos` desde `caddy_origenes` (`inventarios/kit/host_vars/comunidad01.yml`). En comunidad01 es el 80 desde la Interna y la Comunidad, en las dos familias. En kit01 la Interna llega por F-07 y la Comunidad llegará por F-09 cuando el portal la autorice (network#8).
+Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible-playbook playbooks/comunidad01.yml`). El rol toma los archivos de `apps/<vm>/caddy/`, deja todo en `/srv/caddy/` (`compose.yml`, `conf/Caddyfile`, `data/` y `config/`), recarga Caddy cuando cambia el Caddyfile y abre en ufw `caddy_puertos` desde `caddy_origenes` (`inventarios/kit/host_vars/comunidad01.yml`). En comunidad01 son el 80 y el 443 desde la Interna y la Comunidad, en las dos familias. En kit01 la Interna llega por F-07 y la Comunidad llegará por F-09 cuando el portal la autorice (network#8).
 
 ## Cómo se verifica
 
@@ -25,7 +26,8 @@ Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible
 |---|---|
 | En comunidad01, `curl -s -o /dev/null -w '%{http_code}' -H 'Host: biblioteca.salud.movil' http://127.0.0.1/` y con `http://[::1]/` | `200` |
 | `sudo ss -tlnp \| grep caddy` | `*:80` y `127.0.0.1:2019` |
-| `sudo ufw status \| grep 80` | `10.20.10.0/24`, `fd5a:fc7e:d716:10::/64`, `10.20.40.0/24` y `fd5a:fc7e:d716:40::/64` |
+| `sudo ufw status \| grep -E '80\|443'` | El 80 y el 443 desde `10.20.10.0/24`, `fd5a:fc7e:d716:10::/64`, `10.20.40.0/24` y `fd5a:fc7e:d716:40::/64` |
+| En comunidad01, `curl --cacert /srv/caddy/pki/raiz.crt --resolve registro.salud.movil:443:10.20.20.12 https://registro.salud.movil/` y con `[fd5a:fc7e:d716:20::12]` | `200` con el formulario |
 | Desde sw01, `/tool fetch url="http://10.20.20.12/" http-header-field="Host: biblioteca.salud.movil" output=user` y con `http://[fd5a:fc7e:d716:20::12]/` | `status: finished` |
 | Desde la Interna, `curl -sI http://ca.salud.movil/raiz.crt` | `200` y `Content-Type: application/x-x509-ca-cert` |
 | `sudo docker logs caddy-caddy-1 2>&1 \| tail -1` | Una línea JSON por petición, con `remote_ip` del cliente |

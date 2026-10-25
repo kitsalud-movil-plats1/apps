@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titulo %}Registro recibido{% endblock %}
+{% block contenido %}
+<h1>¡Listo, {{ nombres }}!</h1>
+<p>Recibimos sus datos. Su código es</p>
+<p class="codigo" aria-label="Código {{ codigo | join(' ') }}">{{ codigo }}</p>
+<p>Guarde este código o tómele una foto. El personal de salud lo va a llamar por él.</p>
+<p><a class="boton" href="/">Registrar a otra persona</a></p>
+{% endblock %}

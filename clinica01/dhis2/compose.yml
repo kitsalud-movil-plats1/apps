@@ -20,8 +20,18 @@ services:
       - work_mem=16MB
       - -c
       - maintenance_work_mem=128MB
+      # pg_hba propio: dhis solo desde la red de Docker y formularios solo
+      # desde comunidad01 (apps#6, F-11)
+      - -c
+      - hba_file=/etc/postgresql/pg_hba.conf
     volumes:
       - ${DATOS}/postgres:/var/lib/postgresql/data
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    # Solo en las IP de clinica01, para los formularios de comunidad01 (F-11);
+    # lo filtra pg_hba.conf
+    ports:
+      - "${IP4}:5432:5432"
+      - "[${IP6}]:5432:5432"
     mem_limit: 2g
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
@@ -57,3 +67,13 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10m
+
+# Subredes fijas para que pg_hba.conf pueda nombrarlas. Con IPv6 en la red,
+# Docker publica por ip6tables y conserva la IP de origen del cliente.
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: ${RED4}
+        - subnet: ${RED6}

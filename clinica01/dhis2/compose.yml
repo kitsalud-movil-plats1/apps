@@ -27,6 +27,11 @@ services:
     volumes:
       - ${DATOS}/postgres:/var/lib/postgresql/data
       - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    # Solo en las IP de clinica01, para los formularios de comunidad01 (F-11);
+    # lo filtra pg_hba.conf
+    ports:
+      - "${IP4}:5432:5432"
+      - "[${IP6}]:5432:5432"
     mem_limit: 2g
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]

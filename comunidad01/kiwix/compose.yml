@@ -1,0 +1,15 @@
+# Biblioteca Kiwix en comunidad01 (R7, D-08, sección 10.5).
+# Sirve todos los ZIM de la carpeta de medios; Caddy publica biblioteca.salud.movil.
+name: kiwix
+
+services:
+  kiwix:
+    image: ghcr.io/kiwix/kiwix-serve:3.8.2
+    restart: unless-stopped
+    command: ["*.zim"]
+    volumes:
+      - /srv/medios/zim:/data:ro
+    # Solo en la VM; Caddy hace de proxy inverso
+    ports:
+      - "127.0.0.1:8090:8080"
+    mem_limit: 512m

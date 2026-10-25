@@ -1,0 +1,70 @@
+---
+- name: Carpeta de medios y de los ZIM
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: ["{{ kiwix_zim_dir | dirname }}", "{{ kiwix_zim_dir }}"]
+
+# Solo se descargan si faltan o no coinciden con el sha256 (F-17, solo IPv4)
+- name: ZIM de la biblioteca
+  ansible.builtin.get_url:
+    url: "{{ contenido_zim_origen }}/{{ item.carpeta }}/{{ item.archivo }}"
+    dest: "{{ kiwix_zim_dir }}/{{ item.archivo }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    owner: root
+    group: root
+    mode: "0644"
+    timeout: 120
+  loop: "{{ contenido_zim }}"
+  loop_control:
+    label: "{{ item.archivo }}"
+  notify: Reiniciar kiwix
+
+- name: ZIM presentes
+  ansible.builtin.find:
+    paths: "{{ kiwix_zim_dir }}"
+    patterns: "*.zim"
+  register: kiwix_zim_hoy
+
+# Kiwix sirve todos los ZIM de la carpeta; los que salen de la lista se quitan
+- name: Quitar los ZIM que ya no están en la lista
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ kiwix_zim_hoy.files | map(attribute='path') | reject('in', contenido_zim | map(attribute='archivo') | map('regex_replace', '^', kiwix_zim_dir ~ '/') | list) | list }}"
+  notify: Reiniciar kiwix
+
+- name: Directorio del Compose
+  ansible.builtin.file:
+    path: "{{ kiwix_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Compose del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ kiwix_fuente }}/compose.yml"
+    dest: "{{ kiwix_dir }}/compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Levantar Kiwix
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ kiwix_dir }}"
+  register: kiwix_up
+  changed_when: kiwix_up.stderr is search('Creat|Recreat|Start')
+  when: kiwix_estado == 'started'
+
+- name: Detener Kiwix (los ZIM quedan en {{ kiwix_zim_dir }})
+  ansible.builtin.command: docker compose down
+  args:
+    chdir: "{{ kiwix_dir }}"
+  register: kiwix_down
+  changed_when: kiwix_down.stderr is search('Remov|Stop')
+  when: kiwix_estado == 'stopped'

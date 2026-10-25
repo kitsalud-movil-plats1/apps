@@ -1,0 +1,8 @@
+# Proxy inverso de comunidad01 (D-16). El contenido público va por HTTP;
+# registro.salud.movil irá por HTTPS con la CA interna (apps#3).
+
+# Biblioteca Kiwix (apps#4)
+http://biblioteca.salud.movil {
+	reverse_proxy 127.0.0.1:8090
+	log
+}

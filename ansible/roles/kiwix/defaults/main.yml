@@ -1,0 +1,8 @@
+---
+# Compose de Kiwix en comunidad01 y carpeta de medios (disco de datos, /srv)
+kiwix_dir: /srv/kiwix
+kiwix_zim_dir: /srv/medios/zim
+# started: docker compose up -d; stopped: docker compose down
+kiwix_estado: started
+# Archivos del repositorio apps que se copian tal cual
+kiwix_fuente: "{{ role_path }}/../../../comunidad01/kiwix"

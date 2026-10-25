@@ -15,7 +15,7 @@ Caddy usa la red del host para escuchar en IPv4 e IPv6 y ver la IP real del clie
 
 ## Cómo se despliega
 
-Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible-playbook playbooks/comunidad01.yml`). El rol deja todo en `/srv/caddy/` (`compose.yml`, `conf/Caddyfile`, `data/` y `config/`), recarga Caddy cuando cambia el Caddyfile y abre en ufw el 80 desde la Interna y la Comunidad, en las dos familias. En kit01 la Interna llega por F-07 y la Comunidad llegará por F-09 cuando el portal la autorice (network#8).
+Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible-playbook playbooks/comunidad01.yml`). El rol toma los archivos de `apps/<vm>/caddy/`, deja todo en `/srv/caddy/` (`compose.yml`, `conf/Caddyfile`, `data/` y `config/`), recarga Caddy cuando cambia el Caddyfile y abre en ufw `caddy_puertos` desde `caddy_origenes` (`inventarios/kit/host_vars/comunidad01.yml`). En comunidad01 es el 80 desde la Interna y la Comunidad, en las dos familias. En kit01 la Interna llega por F-07 y la Comunidad llegará por F-09 cuando el portal la autorice (network#8).
 
 ## Cómo se verifica
 

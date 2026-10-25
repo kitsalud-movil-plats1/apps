@@ -1,0 +1,14 @@
+---
+# Compose de Caddy en comunidad01 y su estado (certificados de la CA interna)
+caddy_dir: /srv/caddy
+# Archivos del repositorio apps que se copian tal cual
+caddy_fuente: "{{ role_path }}/../../../comunidad01/caddy"
+
+# HTTP desde la Interna (F-07) y la Comunidad (F-09). La autorización del
+# portal la hace nftables en kit01; ufw es la segunda barrera.
+caddy_origenes:
+  - "{{ redes.interna.ipv4 }}"
+  - "{{ redes.interna.ipv6 }}"
+  - "{{ redes.comunidad.ipv4 }}"
+  - "{{ redes.comunidad.ipv6 }}"
+caddy_puertos: ["80"]

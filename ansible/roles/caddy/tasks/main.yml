@@ -1,0 +1,42 @@
+---
+- name: Directorios de Caddy
+  ansible.builtin.file:
+    path: "{{ caddy_dir }}/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: ["", conf, data, config]
+
+- name: Compose del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ caddy_fuente }}/compose.yml"
+    dest: "{{ caddy_dir }}/compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Caddyfile del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ caddy_fuente }}/Caddyfile"
+    dest: "{{ caddy_dir }}/conf/Caddyfile"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Recargar caddy
+
+- name: Levantar Caddy
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ caddy_dir }}"
+  register: caddy_up
+  changed_when: caddy_up.stderr is search('Creat|Recreat|Start')
+
+- name: Puertos de Caddy en ufw
+  community.general.ufw:
+    rule: allow
+    proto: tcp
+    port: "{{ item.1 }}"
+    from_ip: "{{ item.0 }}"
+    comment: caddy
+  loop: "{{ caddy_origenes | product(caddy_puertos) | list }}"

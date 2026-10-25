@@ -1,0 +1,5 @@
+---
+- name: Recargar caddy
+  ansible.builtin.command: docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile
+  args:
+    chdir: "{{ caddy_dir }}"

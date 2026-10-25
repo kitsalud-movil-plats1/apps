@@ -15,4 +15,4 @@ comunidad01 es la única VM a la que llega la comunidad (80/443). No guarda dato
 
 Cada servicio incluye un `.env.example`. Los valores reales nunca se versionan; los genera Ansible desde el vault.
 
-Los roles de Ansible de este repositorio están en `ansible/roles/` (`docker` y `dhis2`) y se ejecutan desde `platform/ansible`, que los encuentra por `roles_path`.
+Los roles de Ansible de este repositorio están en `ansible/roles/` (`docker`, `dhis2`, `kiwix` y `caddy`) y se ejecutan desde `platform/ansible`, que los encuentra por `roles_path`.

@@ -1,15 +1,17 @@
 # Caddy en comunidad01
 
-Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por nombre y, más adelante, el registro por HTTPS con la CA interna (apps#3).
+Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por nombre y la raíz de la CA del kit. Más adelante publicará el registro por HTTPS (apps#6), firmado por el intermedio de comunidad01 ([`platform/kit01/ca/`](../../../platform/kit01/ca/README.md)).
 
 | Archivo | Qué es |
 |---|---|
-| [`compose.yml`](compose.yml) | `caddy:2.11.7` con la red del host (`network_mode: host`), límite de 256 MB y `restart: unless-stopped`. Monta la carpeta `conf/` y no el archivo, para que una recarga vea el Caddyfile nuevo |
-| [`Caddyfile`](Caddyfile) | Un bloque por nombre de servicio |
+| [`compose.yml`](compose.yml) | `caddy:2.11.7` con la red del host (`network_mode: host`), límite de 256 MB y `restart: unless-stopped`. Monta la carpeta `conf/` y no el archivo, para que una recarga vea el Caddyfile nuevo, `pki/` en `/pki` y `publica/` en `/srv/publica` |
+| [`Caddyfile`](Caddyfile) | La CA `local` con la raíz (solo el certificado) y el intermedio de comunidad01, que solo vale para `registro`, y un bloque por nombre de servicio |
+| [`publica/index.html`](publica/index.html) | Página con las instrucciones para instalar la raíz en Android, iPhone, Windows y Linux. El rol `ca_interna` deja `raiz.crt` al lado |
 
 | Nombre | Destino | Protocolo |
 |---|---|---|
 | `biblioteca.salud.movil` | Kiwix en `127.0.0.1:8090` | HTTP |
+| `ca.salud.movil` | `/srv/publica` (página y `raiz.crt` con `Content-Type: application/x-x509-ca-cert`) | HTTP |
 
 Caddy usa la red del host para escuchar en IPv4 e IPv6 y ver la IP real del cliente en el log de acceso (`log`, a la salida del contenedor). Los servicios quedan publicados solo en `127.0.0.1`. La API de administración de Caddy escucha solo en `127.0.0.1:2019`.
 
@@ -25,6 +27,7 @@ Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible
 | `sudo ss -tlnp \| grep caddy` | `*:80` y `127.0.0.1:2019` |
 | `sudo ufw status \| grep 80` | `10.20.10.0/24`, `fd5a:fc7e:d716:10::/64`, `10.20.40.0/24` y `fd5a:fc7e:d716:40::/64` |
 | Desde sw01, `/tool fetch url="http://10.20.20.12/" http-header-field="Host: biblioteca.salud.movil" output=user` y con `http://[fd5a:fc7e:d716:20::12]/` | `status: finished` |
+| Desde la Interna, `curl -sI http://ca.salud.movil/raiz.crt` | `200` y `Content-Type: application/x-x509-ca-cert` |
 | `sudo docker logs caddy-caddy-1 2>&1 \| tail -1` | Una línea JSON por petición, con `remote_ip` del cliente |
 
 ## Cómo se ve desde la máquina propia

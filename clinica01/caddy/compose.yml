@@ -1,0 +1,15 @@
+# Caddy en clinica01 (D-16). Usa la red del host para escuchar en IPv4 e
+# IPv6 con la IP real del cliente; los servicios quedan en 127.0.0.1.
+name: caddy
+
+services:
+  caddy:
+    image: caddy:2.11.7
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      # La carpeta y no el archivo, para que vea el Caddyfile nuevo al recargar
+      - ./conf:/etc/caddy:ro
+      - ./data:/data
+      - ./config:/config
+    mem_limit: 256m

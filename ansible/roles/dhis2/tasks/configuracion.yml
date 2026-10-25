@@ -1,0 +1,152 @@
+---
+# Configuración por la API: clave de admin, metadatos del kit, cuentas del
+# personal y pacientes ficticios (S-09). Cada paso solo actúa si hace falta.
+- name: Esperar a que DHIS2 responda
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/system/ping"
+    status_code: 200
+  register: dhis2_ping
+  until: dhis2_ping.status == 200
+  retries: 60
+  delay: 10
+
+- name: Clave de admin vigente
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/me?fields=id"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 401]
+  register: dhis2_admin_me
+  no_log: true
+
+- name: Cambiar la clave de fábrica de admin por la del vault
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/me/changePassword"
+    method: PUT
+    url_username: admin
+    url_password: "{{ dhis2_admin_fabrica }}"
+    force_basic_auth: true
+    body_format: json
+    body: { oldPassword: "{{ dhis2_admin_fabrica }}", newPassword: "{{ dhis2_admin_password }}" }
+    status_code: [200, 202, 204]
+  when: dhis2_admin_me.status == 401
+  changed_when: true
+  no_log: true
+
+- name: Metadatos del kit en la VM
+  ansible.builtin.copy:
+    src: "{{ dhis2_fuente }}/metadatos/kit.json"
+    dest: "{{ dhis2_dir }}/kit.json"
+    owner: root
+    group: root
+    mode: "0644"
+  register: dhis2_kit_json
+
+- name: Programa del kit presente
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/programs/{{ dhis2_programa }}?fields=id"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: dhis2_programa_hoy
+  no_log: true
+
+# Se importa si cambió el archivo o si falta el programa (base nueva)
+- name: Importar los metadatos del kit
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/metadata?importStrategy=CREATE_AND_UPDATE&atomicMode=ALL&importReportMode=ERRORS"
+    method: POST
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ lookup('ansible.builtin.file', dhis2_fuente ~ '/metadatos/kit.json') | from_json }}"
+    timeout: 300
+  register: dhis2_import
+  when: dhis2_kit_json is changed or dhis2_programa_hoy.status == 404
+  changed_when: true
+  failed_when: dhis2_import.json.status | default('') != 'OK'
+
+- name: Cuentas existentes
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/users?fields=username&paging=false"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+  register: dhis2_cuentas_hoy
+  no_log: true
+
+# La clave solo se pone al crear la cuenta; después cada persona la cambia
+- name: Cuentas locales del personal
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/users"
+    method: POST
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body:
+      username: "{{ item.usuario }}"
+      password: "{{ dhis2_usuarios_password }}"
+      firstName: "{{ item.nombres }}"
+      surname: "{{ item.apellidos }}"
+      userRoles: [{ id: "{{ item.rol }}" }]
+      userGroups: [{ id: "{{ dhis2_grupo }}" }]
+      organisationUnits: [{ id: "{{ dhis2_ou }}" }]
+      dataViewOrganisationUnits: [{ id: "{{ dhis2_ou }}" }]
+      teiSearchOrganisationUnits: [{ id: "{{ dhis2_ou }}" }]
+    status_code: [200, 201]
+  loop: "{{ dhis2_usuarios | rejectattr('usuario', 'in', dhis2_cuentas_hoy.json.users | map(attribute='username') | list) | list }}"
+  loop_control:
+    label: "{{ item.usuario }}"
+  changed_when: true
+  no_log: true
+
+- name: Unidades de admin
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/me?fields=id,organisationUnits[id],teiSearchOrganisationUnits[id],dataViewOrganisationUnits[id]"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+  register: dhis2_admin_ou
+  no_log: true
+
+- name: admin captura y busca en la unidad del kit
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/users/{{ dhis2_admin_ou.json.id }}/{{ item }}/{{ dhis2_ou }}"
+    method: POST
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 204]
+  loop: [organisationUnits, teiSearchOrganisationUnits, dataViewOrganisationUnits]
+  when: dhis2_ou not in (dhis2_admin_ou.json[item] | map(attribute='id') | list)
+  changed_when: true
+  no_log: true
+
+- name: Pacientes ficticios presentes
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/tracker/trackedEntities/PacFict0001?fields=trackedEntity"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: dhis2_ficticios_hoy
+  no_log: true
+
+- name: Cargar los pacientes ficticios
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/tracker?async=false&importStrategy=CREATE_AND_UPDATE"
+    method: POST
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ lookup('ansible.builtin.file', dhis2_fuente ~ '/metadatos/pacientes-ficticios.json') | from_json }}"
+    timeout: 300
+  register: dhis2_ficticios
+  when: dhis2_ficticios_hoy.status == 404
+  changed_when: true
+  failed_when: dhis2_ficticios.json.status | default('') != 'OK'

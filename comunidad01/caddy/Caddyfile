@@ -1,5 +1,25 @@
 # Proxy inverso de comunidad01 (D-16). El contenido público va por HTTP;
-# registro.salud.movil irá por HTTPS con la CA interna (apps#3).
+# registro.salud.movil irá por HTTPS con la CA del kit (apps#6).
+{
+	# La raíz no se instala en el sistema del contenedor
+	skip_install_trust
+	# CA del kit (D-16, apps#3): firma con el intermedio de esta VM, que solo
+	# vale para sus nombres; la llave de la raíz no está en la VM
+	pki {
+		ca local {
+			name "Kit de salud movil"
+			root {
+				format pem_file
+				cert /pki/raiz.crt
+			}
+			intermediate {
+				format pem_file
+				cert /pki/intermedio.crt
+				key /pki/intermedio.key
+			}
+		}
+	}
+}
 
 # Biblioteca Kiwix (apps#4)
 http://biblioteca.salud.movil {

@@ -1,10 +1,25 @@
-# Proxy inverso de clinica01 (D-16). Todo va por HTTPS con la CA interna de
-# Caddy; apps#3 la reemplaza por la raíz compartida con comunidad01.
+# Proxy inverso de clinica01 (D-16). Todo va por HTTPS con la CA del kit.
 {
 	# La raíz no se instala en el sistema del contenedor
 	skip_install_trust
 	# Certificado para los clientes que llegan por IP y no mandan SNI
 	default_sni pacientes.salud.movil
+	# CA del kit (D-16, apps#3): firma con el intermedio de esta VM, que solo
+	# vale para sus nombres; la llave de la raíz no está en la VM
+	pki {
+		ca local {
+			name "Kit de salud movil"
+			root {
+				format pem_file
+				cert /pki/raiz.crt
+			}
+			intermediate {
+				format pem_file
+				cert /pki/intermedio.crt
+				key /pki/intermedio.key
+			}
+		}
+	}
 }
 
 # DHIS2 (apps#2)

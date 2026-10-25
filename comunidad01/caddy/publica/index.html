@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificado del kit de salud</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 0 auto; padding: 1rem; line-height: 1.5; color: #1d2733; background: #fff; }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.1rem; margin-top: 1.6rem; }
+  a.boton { display: inline-block; padding: .7rem 1.1rem; background: #0b6e4f; color: #fff; border-radius: .4rem; text-decoration: none; font-weight: 600; }
+  code { background: #eef2f5; padding: 0 .25rem; border-radius: .2rem; }
+  li { margin: .3rem 0; }
+</style>
+</head>
+<body>
+<h1>Certificado del kit de salud</h1>
+<p>Las páginas del kit que manejan datos (registro de pacientes y prerregistro) usan HTTPS con un certificado propio del kit. Si instala este certificado una vez, el navegador deja de mostrar la advertencia de seguridad.</p>
+<p><a class="boton" href="/raiz.crt">Descargar el certificado</a></p>
+
+<h2>Android</h2>
+<ol>
+  <li>Descargue el certificado con el botón de arriba.</li>
+  <li>Abra <b>Ajustes</b>, <b>Seguridad</b>, <b>Más ajustes de seguridad</b> (o <b>Cifrado y credenciales</b>) y luego <b>Instalar un certificado</b>, <b>Certificado de CA</b>.</li>
+  <li>Elija el archivo <code>raiz.crt</code> de Descargas y confirme.</li>
+</ol>
+
+<h2>iPhone o iPad</h2>
+<ol>
+  <li>Descargue el certificado con Safari y acepte descargar el perfil.</li>
+  <li>Abra <b>Ajustes</b>, <b>Perfil descargado</b> e <b>Instalar</b>.</li>
+  <li>Abra <b>Ajustes</b>, <b>General</b>, <b>Información</b>, <b>Ajustes de confianza de certificados</b> y active <b>Kit de salud movil - Raiz</b>.</li>
+</ol>
+
+<h2>Windows</h2>
+<ol>
+  <li>Descargue el certificado y ábralo con doble clic.</li>
+  <li>Elija <b>Instalar certificado</b>, <b>Equipo local</b> y la opción <b>Colocar todos los certificados en el siguiente almacén</b>.</li>
+  <li>Seleccione <b>Entidades de certificación raíz de confianza</b> y termine. Firefox usa su propio almacén: <b>Ajustes</b>, <b>Privacidad y seguridad</b>, <b>Ver certificados</b>, <b>Importar</b>.</li>
+</ol>
+
+<h2>Linux</h2>
+<p><code>sudo cp raiz.crt /usr/local/share/ca-certificates/kit-salud.crt &amp;&amp; sudo update-ca-certificates</code></p>
+</body>
+</html>

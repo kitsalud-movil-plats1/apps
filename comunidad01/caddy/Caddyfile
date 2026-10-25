@@ -26,3 +26,12 @@ http://biblioteca.salud.movil {
 	reverse_proxy 127.0.0.1:8090
 	log
 }
+
+# Raíz de la CA del kit para instalarla en los equipos (apps#3)
+http://ca.salud.movil {
+	root * /srv/publica
+	@raiz path /raiz.crt
+	header @raiz Content-Type application/x-x509-ca-cert
+	file_server
+	log
+}

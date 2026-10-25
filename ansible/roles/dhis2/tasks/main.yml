@@ -21,14 +21,14 @@
     group: "{{ dhis2_uid }}"
     mode: "0750"
 
-- name: Compose y dhis.conf del repositorio apps
+- name: Compose, dhis.conf y context.xml del repositorio apps
   ansible.builtin.copy:
     src: "{{ dhis2_fuente }}/{{ item }}"
     dest: "{{ dhis2_dir }}/{{ item }}"
     owner: root
     group: root
     mode: "0644"
-  loop: [compose.yml, dhis.conf]
+  loop: [compose.yml, dhis.conf, context.xml]
   register: dhis2_archivos
 
 - name: Variables y contraseña de la base desde el vault
@@ -47,6 +47,14 @@
   register: dhis2_up
   changed_when: dhis2_up.stderr is search('Creat|Recreat|Start')
   when: dhis2_estado == 'started'
+
+# Los archivos van montados uno por uno: el contenedor solo ve la versión
+# nueva después de reiniciarlo
+- name: Reiniciar DHIS2 si cambió su configuración
+  ansible.builtin.command: docker compose restart core
+  args:
+    chdir: "{{ dhis2_dir }}"
+  when: dhis2_estado == 'started' and dhis2_archivos is changed and dhis2_up is not changed
 
 - name: Detener DHIS2 (los datos quedan en {{ dhis2_dir }})
   ansible.builtin.command: docker compose down

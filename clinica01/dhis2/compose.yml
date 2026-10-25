@@ -41,8 +41,10 @@ services:
       JAVA_OPTS: -Xms1g -Xmx2g
     volumes:
       - ./dhis.conf:/opt/dhis2/dhis.conf:ro
+      # Detrás de Caddy: respeta X-Forwarded-Proto y X-Forwarded-For
+      - ./context.xml:/usr/local/tomcat/conf/context.xml:ro
       - ${DATOS}/files:/opt/dhis2/files
-    # Solo en la VM; Caddy publica pacientes.salud.movil (apps#2, apps#3)
+    # Solo en la VM; Caddy publica pacientes.salud.movil
     ports:
       - "127.0.0.1:8080:8080"
     mem_limit: 4g

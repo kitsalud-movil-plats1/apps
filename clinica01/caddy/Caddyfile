@@ -10,6 +10,9 @@
 # DHIS2 (apps#2)
 pacientes.salud.movil {
 	tls internal
-	reverse_proxy 127.0.0.1:8080
+	reverse_proxy 127.0.0.1:8080 {
+		# El puerto que usó el cliente (443, o el de un túnel), para las redirecciones de DHIS2
+		header_up X-Forwarded-Port {http.request.port}
+	}
 	log
 }

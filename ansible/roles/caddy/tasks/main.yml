@@ -25,6 +25,17 @@
     mode: "0644"
   notify: Recargar caddy
 
+# Archivos estáticos de apps/<vm>/caddy/publica/, si la VM los tiene
+- name: Archivos públicos del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ caddy_fuente }}/publica/"
+    dest: "{{ caddy_dir }}/publica/"
+    owner: root
+    group: root
+    mode: "0644"
+    directory_mode: "0755"
+  when: (caddy_fuente ~ '/publica') is directory
+
 - name: Levantar Caddy
   ansible.builtin.command: docker compose up -d
   args:

@@ -12,4 +12,8 @@ services:
       - ./conf:/etc/caddy:ro
       - ./data:/data
       - ./config:/config
+      # Raíz e intermedio de la CA del kit (apps#3); la raíz no lleva llave
+      - ./pki:/pki:ro
+      # Archivos que se publican tal cual (página y raíz de la CA)
+      - ./publica:/srv/publica:ro
     mem_limit: 256m

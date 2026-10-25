@@ -47,7 +47,7 @@ Docker y Compose vienen de los paquetes de Ubuntu (`docker.io` 29.1.3 y `docker-
 
 ## Cómo se accede
 
-Desde la Interna, en `https://pacientes.salud.movil` (F-05). El certificado lo firma la CA local de Caddy en clinica01, así que el navegador muestra una advertencia hasta instalar la raíz (apps#3 la unifica y la publica). La app para registrar pacientes es **Capture**.
+Desde la Interna, en `https://pacientes.salud.movil` (F-05). El certificado lo firma la CA del kit; para que el navegador no muestre la advertencia se instala la raíz desde `http://ca.salud.movil`. La app para registrar pacientes es **Capture**.
 
 Desde la máquina propia, con un túnel a través de kit01 y una línea en `/etc/hosts`. DHIS2 conserva el puerto del túnel en sus redirecciones.
 

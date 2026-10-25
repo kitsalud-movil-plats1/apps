@@ -1,0 +1,44 @@
+---
+- name: Directorio de los formularios
+  ansible.builtin.file:
+    path: "{{ formularios_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Código, plantillas y Compose del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ formularios_fuente }}/"
+    dest: "{{ formularios_dir }}/"
+    owner: root
+    group: root
+    mode: "0644"
+    directory_mode: "0755"
+  register: formularios_codigo
+
+- name: Variables y contraseña de la base desde el vault
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ formularios_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+  register: formularios_env
+  no_log: true
+
+# Si cambió el código se reconstruye la imagen; si no, solo se asegura que esté arriba
+- name: Construir y levantar los formularios
+  ansible.builtin.command: docker compose up -d --build
+  args:
+    chdir: "{{ formularios_dir }}"
+  when: formularios_codigo is changed or formularios_env is changed
+  changed_when: true
+
+- name: Formularios arriba
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ formularios_dir }}"
+  register: formularios_up
+  changed_when: formularios_up.stderr is search('Creat|Recreat|Start')
+  when: not (formularios_codigo is changed or formularios_env is changed)

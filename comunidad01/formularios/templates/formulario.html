@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% macro error(campo) %}{% if errores.get(campo) %}<p class="error" id="error-{{ campo }}">{{ errores[campo] }}</p>{% endif %}{% endmacro %}
+{% block contenido %}
+<h1>Prerregistro para la consulta</h1>
+<p>Llene estos datos mientras espera. Así el personal de salud lo atiende más rápido. Si necesita ayuda, pídala al personal.</p>
+
+{% if aviso %}<p class="aviso" role="alert">{{ aviso }}</p>{% endif %}
+{% if errores %}<p class="aviso" role="alert">Revise los datos marcados en rojo.</p>{% endif %}
+
+<form method="post" action="/" novalidate>
+  <label for="nombres">Nombres</label>
+  <input id="nombres" name="nombres" autocomplete="given-name" maxlength="80" value="{{ datos.get('nombres', '') }}" {% if errores.get('nombres') %}aria-invalid="true"{% endif %}>
+  {{ error('nombres') }}
+
+  <label for="apellidos">Apellidos</label>
+  <input id="apellidos" name="apellidos" autocomplete="family-name" maxlength="80" value="{{ datos.get('apellidos', '') }}" {% if errores.get('apellidos') %}aria-invalid="true"{% endif %}>
+  {{ error('apellidos') }}
+
+  <label for="tipo_documento">Tipo de documento</label>
+  <select id="tipo_documento" name="tipo_documento">
+    <option value="">Elija una opción</option>
+    {% for valor, texto in tipos %}<option value="{{ valor }}" {% if datos.get('tipo_documento') == valor %}selected{% endif %}>{{ texto }}</option>{% endfor %}
+  </select>
+  {{ error('tipo_documento') }}
+
+  <label for="numero_documento">Número de documento <span class="nota">(si no tiene, déjelo vacío)</span></label>
+  <input id="numero_documento" name="numero_documento" inputmode="numeric" maxlength="20" value="{{ datos.get('numero_documento', '') }}">
+  {{ error('numero_documento') }}
+
+  <label for="fecha_nacimiento">Fecha de nacimiento <span class="nota">(opcional)</span></label>
+  <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" min="1900-01-01" max="{{ hoy }}" value="{{ datos.get('fecha_nacimiento', '') }}">
+  {{ error('fecha_nacimiento') }}
+
+  <label for="celular">Celular <span class="nota">(opcional)</span></label>
+  <input id="celular" name="celular" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" value="{{ datos.get('celular', '') }}">
+  {{ error('celular') }}
+
+  <fieldset>
+    <legend>¿Por qué viene a la consulta?</legend>
+    {% for valor, texto in motivos %}
+    <label class="opcion"><input type="radio" name="motivo" value="{{ valor }}" {% if datos.get('motivo') == valor %}checked{% endif %}> {{ texto }}</label>
+    {% endfor %}
+    {{ error('motivo') }}
+  </fieldset>
+
+  <label for="detalle">Cuéntenos un poco más <span class="nota">(opcional)</span></label>
+  <textarea id="detalle" name="detalle" rows="3" maxlength="200">{{ datos.get('detalle', '') }}</textarea>
+  {{ error('detalle') }}
+
+  <div class="autoriza">
+    <label class="opcion"><input type="checkbox" name="autoriza_datos" value="si" {% if datos.get('autoriza_datos') %}checked{% endif %}>
+    Autorizo que el personal de salud del kit use estos datos solo para atenderme hoy, según la Ley 1581 de 2012 de protección de datos personales. Mis datos no se publican ni se comparten con otras personas.</label>
+    {{ error('autoriza_datos') }}
+  </div>
+
+  <button type="submit">Enviar</button>
+</form>
+{% endblock %}

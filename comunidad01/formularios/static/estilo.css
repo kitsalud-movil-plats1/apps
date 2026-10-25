@@ -1,0 +1,20 @@
+:root { --verde: #0b6e4f; --rojo: #b00020; --texto: #1d2733; --fondo: #ffffff; --suave: #eef2f5; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; font-size: 1.1rem; line-height: 1.5; color: var(--texto); background: var(--fondo); }
+header { background: var(--verde); color: #fff; padding: .6rem 1rem; }
+.marca { margin: 0; font-weight: 700; }
+main { max-width: 36rem; margin: 0 auto; padding: 1rem; }
+h1 { font-size: 1.4rem; }
+label { display: block; margin-top: 1rem; font-weight: 600; }
+.nota { font-weight: 400; color: #4a5866; }
+input, select, textarea { width: 100%; font: inherit; padding: .6rem; border: 2px solid #8a97a3; border-radius: .4rem; margin-top: .3rem; background: #fff; }
+input[aria-invalid="true"] { border-color: var(--rojo); }
+fieldset { border: 0; padding: 0; margin: 1.2rem 0 0; }
+legend { font-weight: 600; }
+.opcion { font-weight: 400; display: flex; gap: .6rem; align-items: flex-start; margin-top: .5rem; }
+.opcion input { width: auto; margin-top: .35rem; transform: scale(1.3); }
+.autoriza { background: var(--suave); padding: .2rem .8rem .8rem; border-radius: .4rem; margin-top: 1.2rem; }
+.error { color: var(--rojo); margin: .3rem 0 0; font-weight: 600; }
+.aviso { background: #fde8e8; border-left: 6px solid var(--rojo); padding: .8rem; border-radius: .3rem; font-weight: 600; }
+button, .boton { display: block; width: 100%; text-align: center; margin-top: 1.5rem; padding: .9rem; font: inherit; font-weight: 700; color: #fff; background: var(--verde); border: 0; border-radius: .5rem; text-decoration: none; }
+.codigo { font-size: 3rem; font-weight: 800; letter-spacing: .4rem; text-align: center; background: var(--suave); border-radius: .5rem; padding: .5rem; margin: .5rem 0; }

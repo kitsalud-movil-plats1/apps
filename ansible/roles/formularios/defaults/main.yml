@@ -1,0 +1,7 @@
+---
+# Formularios de prerregistro en comunidad01 (apps#6)
+formularios_dir: /srv/formularios
+# Archivos del repositorio apps que se copian tal cual
+formularios_fuente: "{{ role_path }}/../../../comunidad01/formularios"
+# PostgreSQL de clinica01 (por nombre, para que use IPv4 e IPv6)
+formularios_db_host: "clinica01.{{ dominio }}"

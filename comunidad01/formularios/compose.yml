@@ -1,0 +1,21 @@
+# Formularios de prerregistro en comunidad01 (R8, D-07). La imagen se construye
+# aquí con el Dockerfile; las variables vienen de .env (ver .env.example).
+name: formularios
+
+services:
+  app:
+    build: .
+    image: kitsalud/formularios:1
+    restart: unless-stopped
+    env_file: .env
+    # Solo en la VM; Caddy publica registro.salud.movil por HTTPS
+    ports:
+      - "127.0.0.1:8100:8000"
+    read_only: true
+    tmpfs: [/tmp]
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/salud', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

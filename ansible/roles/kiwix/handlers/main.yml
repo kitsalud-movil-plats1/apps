@@ -1,0 +1,7 @@
+---
+# kiwix-serve lee la lista de ZIM al arrancar
+- name: Reiniciar kiwix
+  ansible.builtin.command: docker compose restart
+  args:
+    chdir: "{{ kiwix_dir }}"
+  when: kiwix_estado == 'started'

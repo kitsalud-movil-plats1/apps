@@ -3,6 +3,8 @@
 {
 	# La raíz no se instala en el sistema del contenedor
 	skip_install_trust
+	# Certificado para los clientes que llegan por IP y no mandan SNI
+	default_sni pacientes.salud.movil
 }
 
 # DHIS2 (apps#2)

@@ -1,0 +1,13 @@
+# Proxy inverso de clinica01 (D-16). Todo va por HTTPS con la CA interna de
+# Caddy; apps#3 la reemplaza por la raíz compartida con comunidad01.
+{
+	# La raíz no se instala en el sistema del contenedor
+	skip_install_trust
+}
+
+# DHIS2 (apps#2)
+pacientes.salud.movil {
+	tls internal
+	reverse_proxy 127.0.0.1:8080
+	log
+}

@@ -1,0 +1,352 @@
+{
+ "organisationUnits": [
+  {
+   "id": "KitSalud001",
+   "name": "Kit de salud móvil",
+   "shortName": "Kit de salud",
+   "openingDate": "2026-01-01"
+  }
+ ],
+ "optionSets": [
+  {
+   "id": "OptSetSexo1",
+   "name": "Sexo",
+   "valueType": "TEXT",
+   "options": [
+    {
+     "id": "OptSexoFem1"
+    },
+    {
+     "id": "OptSexoMas1"
+    },
+    {
+     "id": "OptSexoOtr1"
+    }
+   ]
+  }
+ ],
+ "options": [
+  {
+   "id": "OptSexoFem1",
+   "code": "F",
+   "name": "Femenino",
+   "sortOrder": 1,
+   "optionSet": {
+    "id": "OptSetSexo1"
+   }
+  },
+  {
+   "id": "OptSexoMas1",
+   "code": "M",
+   "name": "Masculino",
+   "sortOrder": 2,
+   "optionSet": {
+    "id": "OptSetSexo1"
+   }
+  },
+  {
+   "id": "OptSexoOtr1",
+   "code": "O",
+   "name": "Otro",
+   "sortOrder": 3,
+   "optionSet": {
+    "id": "OptSetSexo1"
+   }
+  }
+ ],
+ "trackedEntityAttributes": [
+  {
+   "id": "AtrNombre01",
+   "name": "Nombre",
+   "shortName": "Nombre",
+   "valueType": "TEXT",
+   "aggregationType": "NONE",
+   "unique": false
+  },
+  {
+   "id": "AtrApellid1",
+   "name": "Apellido",
+   "shortName": "Apellido",
+   "valueType": "TEXT",
+   "aggregationType": "NONE",
+   "unique": false
+  },
+  {
+   "id": "AtrDocumen1",
+   "name": "Documento",
+   "shortName": "Documento",
+   "valueType": "TEXT",
+   "aggregationType": "NONE",
+   "unique": true
+  },
+  {
+   "id": "AtrFechaNa1",
+   "name": "Fecha de nacimiento",
+   "shortName": "Fecha de nacimiento",
+   "valueType": "DATE",
+   "aggregationType": "NONE",
+   "unique": false
+  },
+  {
+   "id": "AtrSexoPac1",
+   "name": "Sexo",
+   "shortName": "Sexo",
+   "valueType": "TEXT",
+   "aggregationType": "NONE",
+   "unique": false,
+   "optionSet": {
+    "id": "OptSetSexo1"
+   }
+  }
+ ],
+ "dataElements": [
+  {
+   "id": "DeMotivoCo1",
+   "name": "Motivo de consulta",
+   "shortName": "Motivo de consulta",
+   "valueType": "LONG_TEXT",
+   "domainType": "TRACKER",
+   "aggregationType": "NONE"
+  },
+  {
+   "id": "DePesoKg001",
+   "name": "Peso (kg)",
+   "shortName": "Peso (kg)",
+   "valueType": "NUMBER",
+   "domainType": "TRACKER",
+   "aggregationType": "NONE"
+  },
+  {
+   "id": "DeTempera01",
+   "name": "Temperatura (°C)",
+   "shortName": "Temperatura (°C)",
+   "valueType": "NUMBER",
+   "domainType": "TRACKER",
+   "aggregationType": "NONE"
+  },
+  {
+   "id": "DeObserva01",
+   "name": "Observaciones",
+   "shortName": "Observaciones",
+   "valueType": "LONG_TEXT",
+   "domainType": "TRACKER",
+   "aggregationType": "NONE"
+  }
+ ],
+ "userGroups": [
+  {
+   "id": "GrpPersCli1",
+   "name": "Personal clínico",
+   "code": "PERSONAL_CLINICO"
+  }
+ ],
+ "userRoles": [
+  {
+   "id": "RolPersCli1",
+   "name": "Personal clínico",
+   "description": "Registro y consulta de pacientes en Capture",
+   "authorities": [
+    "M_dhis-web-capture",
+    "M_dhis-web-dashboard",
+    "F_TRACKED_ENTITY_ADD",
+    "F_TRACKED_ENTITY_UPDATE"
+   ]
+  },
+  {
+   "id": "RolAdmiKit1",
+   "name": "Administrador",
+   "description": "Administración completa de DHIS2",
+   "authorities": [
+    "ALL"
+   ]
+  }
+ ],
+ "trackedEntityTypes": [
+  {
+   "id": "TipoPacien1",
+   "name": "Paciente",
+   "shortName": "Paciente",
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "rwrw----"
+     }
+    }
+   },
+   "minAttributesRequiredToSearch": 1,
+   "trackedEntityTypeAttributes": [
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrNombre01"
+     },
+     "searchable": true,
+     "displayInList": true
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrApellid1"
+     },
+     "searchable": true,
+     "displayInList": true
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrDocumen1"
+     },
+     "searchable": true,
+     "displayInList": true
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrFechaNa1"
+     },
+     "searchable": false,
+     "displayInList": true
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrSexoPac1"
+     },
+     "searchable": false,
+     "displayInList": true
+    }
+   ]
+  }
+ ],
+ "programs": [
+  {
+   "id": "ProgAtenPr1",
+   "name": "Atención primaria",
+   "shortName": "Atención primaria",
+   "programType": "WITH_REGISTRATION",
+   "trackedEntityType": {
+    "id": "TipoPacien1"
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "rwrw----"
+     }
+    }
+   },
+   "accessLevel": "OPEN",
+   "displayFrontPageList": true,
+   "minAttributesRequiredToSearch": 1,
+   "onlyEnrollOnce": true,
+   "programTrackedEntityAttributes": [
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrNombre01"
+     },
+     "searchable": true,
+     "displayInList": true,
+     "mandatory": true,
+     "sortOrder": 1
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrApellid1"
+     },
+     "searchable": true,
+     "displayInList": true,
+     "mandatory": true,
+     "sortOrder": 2
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrDocumen1"
+     },
+     "searchable": true,
+     "displayInList": true,
+     "mandatory": true,
+     "sortOrder": 3
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrFechaNa1"
+     },
+     "searchable": false,
+     "displayInList": true,
+     "mandatory": false,
+     "sortOrder": 4
+    },
+    {
+     "trackedEntityAttribute": {
+      "id": "AtrSexoPac1"
+     },
+     "searchable": false,
+     "displayInList": true,
+     "mandatory": false,
+     "sortOrder": 5
+    }
+   ],
+   "programStages": [
+    {
+     "id": "EtapaConsu1"
+    }
+   ]
+  }
+ ],
+ "programStages": [
+  {
+   "id": "EtapaConsu1",
+   "name": "Consulta",
+   "program": {
+    "id": "ProgAtenPr1"
+   },
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "rwrw----"
+     }
+    }
+   },
+   "repeatable": true,
+   "sortOrder": 1,
+   "programStageDataElements": [
+    {
+     "dataElement": {
+      "id": "DeMotivoCo1"
+     },
+     "compulsory": true,
+     "sortOrder": 1
+    },
+    {
+     "dataElement": {
+      "id": "DePesoKg001"
+     },
+     "compulsory": false,
+     "sortOrder": 2
+    },
+    {
+     "dataElement": {
+      "id": "DeTempera01"
+     },
+     "compulsory": false,
+     "sortOrder": 3
+    },
+    {
+     "dataElement": {
+      "id": "DeObserva01"
+     },
+     "compulsory": false,
+     "sortOrder": 4
+    }
+   ]
+  }
+ ]
+}

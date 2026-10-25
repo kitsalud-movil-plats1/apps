@@ -55,3 +55,7 @@
   register: dhis2_down
   changed_when: dhis2_down.stderr is search('Remov|Stop')
   when: dhis2_estado == 'stopped'
+
+- name: Clave de admin, metadatos, cuentas y pacientes ficticios
+  ansible.builtin.import_tasks: configuracion.yml
+  when: dhis2_estado == 'started'

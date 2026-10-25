@@ -1,0 +1,1204 @@
+{
+ "trackedEntities": [
+  {
+   "trackedEntity": "PacFict0001",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Marta"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Quintero"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0001"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1985-03-12"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0001",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-20",
+     "occurredAt": "2026-10-20",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0001",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-20",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Control de presión arterial"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "27"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.5"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0002",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "José"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Arango"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0002"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1972-11-02"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0002",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-21",
+     "occurredAt": "2026-10-21",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0002",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-21",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Fiebre y malestar general"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "34"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "37.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0003",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Luisa"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Mosquera"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0003"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1994-07-21"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0003",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-22",
+     "occurredAt": "2026-10-22",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0003",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-22",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Control prenatal"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "41"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0004",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Pedro"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Cardona"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0004"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1960-01-30"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0004",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-23",
+     "occurredAt": "2026-10-23",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0004",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-23",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Dolor de espalda"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "48"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.5"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0005",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Camila"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Restrepo"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0005"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "2001-05-09"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0005",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-19",
+     "occurredAt": "2026-10-19",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0005",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-19",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Tos persistente"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "55"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "37.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0006",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Andrés"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Valencia"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0006"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1989-09-15"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0006",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-20",
+     "occurredAt": "2026-10-20",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0006",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-20",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Control de crecimiento"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "62"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0007",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Rosa"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Palacios"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0007"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1955-12-03"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0007",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-21",
+     "occurredAt": "2026-10-21",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0007",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-21",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Herida en la mano"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "69"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.5"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0008",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Julián"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Ocampo"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0008"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "2010-04-18"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0008",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-22",
+     "occurredAt": "2026-10-22",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0008",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-22",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Dolor de cabeza"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "76"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "37.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0009",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Sara"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Ibarra"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0009"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "2015-08-27"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0009",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-23",
+     "occurredAt": "2026-10-23",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0009",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-23",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Revisión general"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "23"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0010",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Héctor"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Salazar"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0010"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1978-02-11"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0010",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-19",
+     "occurredAt": "2026-10-19",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0010",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-19",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Diarrea"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "30"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.5"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0011",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Natalia"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Bermúdez"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0011"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1999-10-05"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0011",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-20",
+     "occurredAt": "2026-10-20",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0011",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-20",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Control de presión arterial"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "37"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "37.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0012",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Fabio"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Cuesta"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0012"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1966-06-22"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0012",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-21",
+     "occurredAt": "2026-10-21",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0012",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-21",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Fiebre y malestar general"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "44"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0013",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Diana"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Murillo"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0013"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1983-01-14"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0013",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-22",
+     "occurredAt": "2026-10-22",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0013",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-22",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Control prenatal"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "51"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.5"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0014",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Óscar"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Rentería"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0014"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1991-03-29"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0014",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-23",
+     "occurredAt": "2026-10-23",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0014",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-23",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Dolor de espalda"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "58"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "37.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0015",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Paula"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Giraldo"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0015"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "2005-11-11"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0015",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-19",
+     "occurredAt": "2026-10-19",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0015",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-19",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Tos persistente"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "65"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0016",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Ramiro"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Hurtado"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0016"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1950-07-07"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0016",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-20",
+     "occurredAt": "2026-10-20",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0016",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-20",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Control de crecimiento"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "72"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.5"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0017",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Elena"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Córdoba"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0017"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1975-09-19"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0017",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-21",
+     "occurredAt": "2026-10-21",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0017",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-21",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Herida en la mano"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "79"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "37.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0018",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Tomás"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Lozano"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0018"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "2018-02-02"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0018",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-22",
+     "occurredAt": "2026-10-22",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0018",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-22",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Dolor de cabeza"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "26"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0019",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Gloria"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Benítez"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0019"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1969-04-25"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "F"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0019",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-23",
+     "occurredAt": "2026-10-23",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0019",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-23",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Revisión general"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "33"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "36.5"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "trackedEntity": "PacFict0020",
+   "trackedEntityType": "TipoPacien1",
+   "orgUnit": "KitSalud001",
+   "attributes": [
+    {
+     "attribute": "AtrNombre01",
+     "value": "Iván"
+    },
+    {
+     "attribute": "AtrApellid1",
+     "value": "Mena"
+    },
+    {
+     "attribute": "AtrDocumen1",
+     "value": "FICT-0020"
+    },
+    {
+     "attribute": "AtrFechaNa1",
+     "value": "1996-12-30"
+    },
+    {
+     "attribute": "AtrSexoPac1",
+     "value": "M"
+    }
+   ],
+   "enrollments": [
+    {
+     "enrollment": "InsFict0020",
+     "program": "ProgAtenPr1",
+     "orgUnit": "KitSalud001",
+     "enrolledAt": "2026-10-19",
+     "occurredAt": "2026-10-19",
+     "status": "ACTIVE",
+     "events": [
+      {
+       "event": "EvtFict0020",
+       "programStage": "EtapaConsu1",
+       "orgUnit": "KitSalud001",
+       "occurredAt": "2026-10-19",
+       "status": "COMPLETED",
+       "dataValues": [
+        {
+         "dataElement": "DeMotivoCo1",
+         "value": "Diarrea"
+        },
+        {
+         "dataElement": "DePesoKg001",
+         "value": "40"
+        },
+        {
+         "dataElement": "DeTempera01",
+         "value": "37.0"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

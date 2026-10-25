@@ -9,3 +9,12 @@ dhis2_uid: 65534
 dhis2_estado: started
 # Archivos del repositorio apps que se copian tal cual
 dhis2_fuente: "{{ role_path }}/../../../clinica01/dhis2"
+
+# API local de DHIS2 (la configuración se hace desde la VM, sin pasar por Caddy)
+dhis2_api: http://127.0.0.1:8080/api
+# UID fijos de metadatos/kit.json
+dhis2_ou: KitSalud001
+dhis2_grupo: GrpPersCli1
+dhis2_programa: ProgAtenPr1
+# Clave de fábrica de admin, solo para cambiarla en el primer arranque
+dhis2_admin_fabrica: district

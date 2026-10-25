@@ -18,3 +18,12 @@ dhis2_grupo: GrpPersCli1
 dhis2_programa: ProgAtenPr1
 # Clave de fábrica de admin, solo para cambiarla en el primer arranque
 dhis2_admin_fabrica: district
+
+# Red de Docker de DHIS2 (pg_hba.conf solo acepta a dhis desde ella). La ULA es
+# propia de la red de Docker, fuera de la del kit.
+dhis2_red4: 172.30.0.0/24
+dhis2_red6: fdc4:5a1d:7e20:1::/64
+
+# Base y usuario de los formularios de prerregistro (apps#6)
+dhis2_prerregistro_db: prerregistro
+dhis2_prerregistro_usuario: formularios

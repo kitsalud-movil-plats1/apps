@@ -1,0 +1,17 @@
+# {{ ansible_managed }} (rol dhis2)
+# PostgreSQL de clinica01. Lo que no está aquí se rechaza.
+# TIPO  BASE          USUARIO      ORIGEN                                      MÉTODO
+
+# Socket local dentro del contenedor (docker exec, healthcheck)
+local   all           all                                                      trust
+
+# DHIS2 desde la red de Docker
+host    {{ dhis2_db_nombre }}         {{ dhis2_db_usuario }}         {{ dhis2_red4 }}                               scram-sha-256
+host    {{ dhis2_db_nombre }}         {{ dhis2_db_usuario }}         {{ dhis2_red6 }}                       scram-sha-256
+
+# Formularios de prerregistro desde comunidad01, solo INSERT (D-07, F-11)
+host    {{ dhis2_prerregistro_db }}  {{ dhis2_prerregistro_usuario }}  {{ equipos.comunidad01.ipv4 }}/32                              scram-sha-256
+host    {{ dhis2_prerregistro_db }}  {{ dhis2_prerregistro_usuario }}  {{ equipos.comunidad01.ipv6 }}/128                  scram-sha-256
+
+host    all           all          0.0.0.0/0                                   reject
+host    all           all          ::/0                                        reject

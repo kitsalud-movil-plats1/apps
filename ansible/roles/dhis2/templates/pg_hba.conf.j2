@@ -13,5 +13,10 @@ host    {{ dhis2_db_nombre }}         {{ dhis2_db_usuario }}         {{ dhis2_re
 host    {{ dhis2_prerregistro_db }}  {{ dhis2_prerregistro_usuario }}  {{ equipos.comunidad01.ipv4 }}/32                              scram-sha-256
 host    {{ dhis2_prerregistro_db }}  {{ dhis2_prerregistro_usuario }}  {{ equipos.comunidad01.ipv6 }}/128                  scram-sha-256
 
+# Consulta de prerregistros desde la propia clinica01 (apps#7). La app usa la
+# red del host y llega por la IP de la VM
+host    {{ dhis2_prerregistro_db }}  {{ dhis2_consultas_usuario }}    {{ equipos.clinica01.ipv4 }}/32                              scram-sha-256
+host    {{ dhis2_prerregistro_db }}  {{ dhis2_consultas_usuario }}    {{ equipos.clinica01.ipv6 }}/128                  scram-sha-256
+
 host    all           all          0.0.0.0/0                                   reject
 host    all           all          ::/0                                        reject

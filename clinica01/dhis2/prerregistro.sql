@@ -1,6 +1,7 @@
 -- Base de los formularios de prerregistro (R8, D-07, apps#6). Idempotente:
 -- se puede ejecutar las veces que haga falta. La corre el rol dhis2 como el
--- usuario dueño del contenedor, con -v clave=<contraseña de formularios>.
+-- usuario dueño del contenedor, con -v clave=<contraseña de formularios> y
+-- -v clave_consultas=<contraseña de consultas>.
 
 SELECT 'CREATE DATABASE prerregistro'
 WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'prerregistro')\gexec
@@ -15,18 +16,23 @@ BEGIN
   IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'formularios') THEN
     CREATE ROLE formularios LOGIN;
   END IF;
+  -- La consulta de clinica01 (apps#7): lee y marca atendido
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'consultas') THEN
+    CREATE ROLE consultas LOGIN;
+  END IF;
 END
 $$;
 
 ALTER ROLE formularios WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE CONNECTION LIMIT 10 PASSWORD :'clave';
+ALTER ROLE consultas WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE CONNECTION LIMIT 10 PASSWORD :'clave_consultas';
 
 REVOKE ALL ON DATABASE prerregistro FROM PUBLIC;
-GRANT CONNECT ON DATABASE prerregistro TO formularios;
+GRANT CONNECT ON DATABASE prerregistro TO formularios, consultas;
 
 \connect prerregistro
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
-GRANT USAGE ON SCHEMA public TO formularios;
+GRANT USAGE ON SCHEMA public TO formularios, consultas;
 
 CREATE TABLE IF NOT EXISTS prerregistros (
   id               bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -48,5 +54,8 @@ ALTER TABLE prerregistros OWNER TO prerregistro_dueno;
 
 -- formularios solo inserta: no lee, no cambia ni borra (la identidad no
 -- necesita permisos sobre su secuencia)
-REVOKE ALL ON prerregistros FROM PUBLIC, formularios;
+REVOKE ALL ON prerregistros FROM PUBLIC, formularios, consultas;
 GRANT INSERT ON prerregistros TO formularios;
+
+-- consultas lee y solo puede cambiar la columna atendido (no inserta ni borra)
+GRANT SELECT, UPDATE (atendido) ON prerregistros TO consultas;

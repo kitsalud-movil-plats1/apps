@@ -69,7 +69,25 @@
   ansible.builtin.command: docker compose restart db
   args:
     chdir: "{{ dhis2_dir }}"
+  register: dhis2_db_reinicio
   when: dhis2_estado == 'started' and dhis2_hba is changed and dhis2_up is not changed
+
+# /api/system/ping no toca la base: tras el reinicio, DHIS2 responde 401 a
+# todos hasta que recupera sus conexiones, y la clave de admin parecería la
+# de fábrica
+- name: Esperar a que DHIS2 recupere la base
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/me?fields=id"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 401, 502, 503]
+  register: dhis2_me_reinicio
+  until: dhis2_me_reinicio.status == 200
+  retries: 30
+  delay: 5
+  when: dhis2_db_reinicio is changed
+  no_log: true
 
 - name: Detener DHIS2 (los datos quedan en {{ dhis2_dir }})
   ansible.builtin.command: docker compose down

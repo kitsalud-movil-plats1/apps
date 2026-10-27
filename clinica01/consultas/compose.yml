@@ -1,0 +1,31 @@
+# Consulta de prerregistros en clinica01 (R8, R10, D-07). La imagen se
+# construye aquí con el Dockerfile; las variables vienen de .env (ver
+# .env.example).
+name: consultas
+
+services:
+  app:
+    build: .
+    image: kitsalud/consultas:1
+    restart: unless-stopped
+    env_file: .env
+    # Red del host, como Caddy: escucha solo en 127.0.0.1:8200, llega al
+    # LDAPS de Samba AD sin abrir el 636 en ufw y a PostgreSQL por la IP de
+    # la VM, que es lo que acepta pg_hba.conf
+    network_mode: host
+    volumes:
+      # Raíz de la CA del kit, para verificar el certificado LDAPS de dc01
+      - /etc/kitsalud/tls/raiz.crt:/certs/raiz.crt:ro
+    read_only: true
+    tmpfs: [/tmp]
+    mem_limit: 256m
+    # Registro de accesos en journald; rsyslog lo reenvía a kit01 (F-15)
+    logging:
+      driver: journald
+      options:
+        tag: consultas
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8200/salud', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

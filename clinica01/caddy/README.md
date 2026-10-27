@@ -10,10 +10,11 @@ Proxy inverso de clinica01 (D-16). Todo lo de clinica01 maneja datos de paciente
 | Nombre | Destino | Protocolo |
 |---|---|---|
 | `pacientes.salud.movil` | DHIS2 en `127.0.0.1:8080` | HTTPS (`tls internal`); el 80 redirige a HTTPS |
+| `consultas.salud.movil` | Consulta de prerregistros en `127.0.0.1:8200` ([`../consultas/`](../consultas/)) | HTTPS (`tls internal`) |
 
 - **CA.** Caddy firma certificados de 12 horas, que renueva solo, con el intermedio de clinica01 (`/srv/caddy/pki/intermedio.crt` y `.key`), que solo vale para `pacientes`, `consultas` y `archivos`. La raíz está en `/srv/caddy/pki/raiz.crt` sin su llave, que solo vive en kit01. La raíz se instala en los equipos desde `http://ca.salud.movil`.
 - **`default_sni`.** Un cliente que llega por IP no manda SNI (por ejemplo `/tool fetch` de sw01); así igual recibe el certificado de `pacientes`.
-- **Cabeceras.** Caddy manda `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Forwarded-Port`, y DHIS2 las respeta por su `context.xml` ([`../dhis2/`](../dhis2/)).
+- **Cabeceras.** Caddy manda `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Forwarded-Port`. DHIS2 las respeta por su `context.xml` ([`../dhis2/`](../dhis2/)) y la consulta por `ProxyFix`.
 
 ## Cómo se despliega
 
@@ -24,9 +25,10 @@ Con el rol `caddy` de `apps/ansible/roles/` desde `platform/ansible/` (`ansible-
 | Comando | Resultado esperado |
 |---|---|
 | En clinica01, `curl -s --cacert /srv/caddy/pki/raiz.crt --resolve pacientes.salud.movil:443:10.20.20.11 -o /dev/null -w '%{http_code} %{redirect_url}' https://pacientes.salud.movil/` y con `[fd5a:fc7e:d716:20::11]` | `302 https://pacientes.salud.movil/dhis-web-login/` |
+| Lo mismo con `consultas.salud.movil` y la ruta `/entrar` | `200` |
 | `echo \| openssl s_client -connect 10.20.20.11:443 -servername pacientes.salud.movil -CAfile /srv/caddy/pki/raiz.crt` | Cadena hoja → `Kit de salud movil - clinica01` → `Kit de salud movil - Raiz` y `Verify return code: 0 (ok)` |
 | `sudo ufw status \| grep 443` | `10.20.10.0/24` y `fd5a:fc7e:d716:10::/64` |
-| Desde sw01, `/tool fetch url="https://10.20.20.11/dhis-web-login/" http-header-field="Host: pacientes.salud.movil" check-certificate=no output=user` y con `[fd5a:fc7e:d716:20::11]` | `status: finished` |
+| Desde sw01, `/tool fetch url="http://10.20.20.11:443/" keep-result=no` y con `[fd5a:fc7e:d716:20::11]` | `Fetch failed with status 400`. Caddy contestó en el 443, así que la Interna llega. Por HTTPS, `/tool fetch` de RouterOS 7.13 no completa el handshake con este Caddy (`ssl: decode error`; ver `contexto/problemas-conocidos.md` en `workspace`) |
 
 ## Diagnóstico
 

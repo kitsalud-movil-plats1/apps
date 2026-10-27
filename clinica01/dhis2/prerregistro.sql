@@ -51,11 +51,13 @@ CREATE TABLE IF NOT EXISTS prerregistros (
   atendido         boolean NOT NULL DEFAULT false
 );
 ALTER TABLE prerregistros OWNER TO prerregistro_dueno;
+-- Cuándo se marcó atendido, para la lista "Atendidos hoy" de la consulta (apps#7)
+ALTER TABLE prerregistros ADD COLUMN IF NOT EXISTS atendido_en timestamptz;
 
 -- formularios solo inserta: no lee, no cambia ni borra (la identidad no
 -- necesita permisos sobre su secuencia)
 REVOKE ALL ON prerregistros FROM PUBLIC, formularios, consultas;
 GRANT INSERT ON prerregistros TO formularios;
 
--- consultas lee y solo puede cambiar la columna atendido (no inserta ni borra)
-GRANT SELECT, UPDATE (atendido) ON prerregistros TO consultas;
+-- consultas lee y solo puede cambiar atendido y atendido_en (no inserta ni borra)
+GRANT SELECT, UPDATE (atendido, atendido_en) ON prerregistros TO consultas;

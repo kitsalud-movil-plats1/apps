@@ -31,3 +31,10 @@ pacientes.salud.movil {
 	}
 	log
 }
+
+# Consulta de prerregistros con login AD (apps#7)
+consultas.salud.movil {
+	tls internal
+	reverse_proxy 127.0.0.1:8200
+	log
+}

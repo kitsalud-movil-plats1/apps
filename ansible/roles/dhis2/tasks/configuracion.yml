@@ -104,6 +104,30 @@
   changed_when: true
   no_log: true
 
+# kit.json define el grupo sin miembros, así que cada importación lo deja
+# vacío; aquí se vuelve a meter a cada cuenta del personal
+- name: Grupo de cada cuenta del personal
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/users?filter=username:in:[{{ dhis2_usuarios | map(attribute='usuario') | join(',') }}]&fields=id,username,userGroups[id]&paging=false"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+  register: dhis2_grupo_hoy
+  no_log: true
+
+- name: Cuentas del personal en el grupo "Personal clínico"
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/userGroups/{{ dhis2_grupo }}/users/{{ item.id }}"
+    method: POST
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 204]
+  loop: "{{ dhis2_grupo_hoy.json.users | rejectattr('userGroups', 'contains', {'id': dhis2_grupo}) | list }}"
+  loop_control:
+    label: "{{ item.username }}"
+  changed_when: true
+
 - name: Unidades de admin
   ansible.builtin.uri:
     url: "{{ dhis2_api }}/me?fields=id,organisationUnits[id],teiSearchOrganisationUnits[id],dataViewOrganisationUnits[id]"

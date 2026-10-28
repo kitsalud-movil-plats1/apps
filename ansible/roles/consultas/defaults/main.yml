@@ -1,0 +1,13 @@
+---
+# Consulta de prerregistros en clinica01 (apps#7)
+consultas_dir: /srv/consultas
+# Archivos del repositorio apps que se copian tal cual
+consultas_fuente: "{{ role_path }}/../../../clinica01/consultas"
+# PostgreSQL por las dos IP de clinica01 (libpq prueba IPv4 y luego IPv6).
+# No va por nombre porque /etc/hosts de la VM lo resuelve a 127.0.1.1, donde
+# no se publica el 5432; pg_hba.conf acepta a consultas solo desde estas IP
+consultas_db_host: "{{ equipos.clinica01.ipv4 }},{{ equipos.clinica01.ipv6 }}"
+# Login LDAPS contra Samba AD (R10). Solo entra el grupo consultas_ldap_grupo
+consultas_ldap_host: "{{ samba_dc_fqdn }}"
+consultas_ldap_base: "{{ samba_realm | lower | split('.') | map('regex_replace', '^', 'DC=') | join(',') }}"
+consultas_ldap_grupo: clinicos

@@ -1,0 +1,46 @@
+---
+- name: Directorio de la consulta
+  ansible.builtin.file:
+    path: "{{ consultas_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+# Solo lo que entra en la imagen y el Compose; el README no fuerza una reconstrucción
+- name: Código, plantillas y Compose del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ consultas_fuente }}/{{ item }}"
+    dest: "{{ consultas_dir }}/"
+    owner: root
+    group: root
+    mode: "0644"
+    directory_mode: "0755"
+  loop: [Dockerfile, requirements.txt, app.py, compose.yml, templates, static]
+  register: consultas_codigo
+
+- name: Variables y contraseña de la base desde el vault
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ consultas_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+  register: consultas_env
+  no_log: true
+
+# Si cambió el código se reconstruye la imagen; si no, solo se asegura que esté arriba
+- name: Construir y levantar la consulta
+  ansible.builtin.command: docker compose up -d --build
+  args:
+    chdir: "{{ consultas_dir }}"
+  when: consultas_codigo is changed or consultas_env is changed
+  changed_when: true
+
+- name: Consulta arriba
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ consultas_dir }}"
+  register: consultas_up
+  changed_when: consultas_up.stderr is search('Creat|Recreat|Start')
+  when: not (consultas_codigo is changed or consultas_env is changed)

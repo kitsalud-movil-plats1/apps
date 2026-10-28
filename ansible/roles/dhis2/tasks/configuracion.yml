@@ -171,9 +171,11 @@
 - name: Base, tabla y roles de prerregistro
   ansible.builtin.shell: >-
     docker exec -i dhis2-db-1 psql -U {{ dhis2_db_usuario }} -d {{ dhis2_db_nombre }}
-    -v ON_ERROR_STOP=1 -v clave="$CLAVE" < {{ dhis2_dir }}/prerregistro.sql
+    -v ON_ERROR_STOP=1 -v clave="$CLAVE" -v clave_consultas="$CLAVE_CONSULTAS"
+    < {{ dhis2_dir }}/prerregistro.sql
   environment:
     CLAVE: "{{ dhis2_prerregistro_password }}"
+    CLAVE_CONSULTAS: "{{ dhis2_consultas_password }}"
   when: dhis2_prerregistro_sql is changed or dhis2_prerregistro_hoy.stdout != '1'
   changed_when: true
   no_log: true

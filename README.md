@@ -5,8 +5,8 @@ Aplicaciones del kit desplegadas con Docker Compose dentro de las VMs.
 | Ruta | VM | Servicio | Nombre |
 |---|---|---|---|
 | `clinica01/dhis2/` | clinica01 | DHIS2 + PostgreSQL (también guarda los formularios), con el programa tracker, las cuentas locales y los pacientes ficticios | `pacientes.salud.movil` |
-| `clinica01/caddy/` | clinica01 | Reverse proxy con HTTPS (CA interna) para `pacientes` y, después, `consultas` | - |
-| `clinica01/consultas/` | clinica01 | Consulta de formularios para el grupo AD `clinicos` | `consultas.salud.movil` |
+| `clinica01/caddy/` | clinica01 | Reverse proxy con HTTPS (CA interna) para `pacientes` y `consultas` | - |
+| `clinica01/consultas/` | clinica01 | Consulta de prerregistros (Flask) con login LDAPS contra Samba AD, solo para el grupo `clinicos`; lee la base y marca a quién se atendió | `consultas.salud.movil` |
 | `comunidad01/caddy/` | comunidad01 | Reverse proxy; HTTPS con la CA interna para `registro`, HTTP para el contenido público | - |
 | `comunidad01/kiwix/` | comunidad01 | Biblioteca de salud y contenido infantil (ZIM) | `biblioteca.salud.movil` |
 | `comunidad01/jellyfin/` | comunidad01 | Audio y video de contenido médico general y para la comunidad, sin transcodificación | `videos.salud.movil` |
@@ -16,4 +16,4 @@ comunidad01 es la única VM a la que llega la comunidad (80/443). No guarda dato
 
 Cada servicio incluye un `.env.example`. Los valores reales nunca se versionan; los genera Ansible desde el vault.
 
-Los roles de Ansible de este repositorio están en `ansible/roles/` (`docker`, `dhis2`, `kiwix`, `formularios` y `caddy`) y se ejecutan desde `platform/ansible`, que los encuentra por `roles_path`.
+Los roles de Ansible de este repositorio están en `ansible/roles/` (`docker`, `dhis2`, `consultas`, `kiwix`, `formularios` y `caddy`) y se ejecutan desde `platform/ansible`, que los encuentra por `roles_path`.

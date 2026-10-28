@@ -1,0 +1,38 @@
+:root { --verde: #0b6e4f; --rojo: #b00020; --texto: #1d2733; --fondo: #ffffff; --suave: #eef2f5; --borde: #c9d2da; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; font-size: 1.05rem; line-height: 1.5; color: var(--texto); background: var(--fondo); }
+header { background: var(--verde); color: #fff; padding: .6rem 1rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; justify-content: space-between; }
+.marca { margin: 0; font-weight: 700; }
+.salir { display: flex; gap: .8rem; align-items: center; }
+.salir button { width: auto; margin: 0; padding: .3rem .9rem; background: #fff; color: var(--verde); }
+main { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+.angosto { max-width: 26rem; margin: 1rem auto; }
+h1 { font-size: 1.4rem; margin-bottom: .2rem; }
+h2 { font-size: 1.2rem; margin-top: 2rem; border-top: 2px solid var(--suave); padding-top: 1rem; }
+label { display: block; margin-top: 1rem; font-weight: 600; }
+.nota { font-weight: 400; color: #4a5866; }
+input { width: 100%; font: inherit; padding: .6rem; border: 2px solid #8a97a3; border-radius: .4rem; margin-top: .3rem; background: #fff; }
+.aviso { background: #fde8e8; border-left: 6px solid var(--rojo); padding: .8rem; border-radius: .3rem; font-weight: 600; }
+button { display: block; width: 100%; text-align: center; margin-top: 1.2rem; padding: .8rem; font: inherit; font-weight: 700; color: #fff; background: var(--verde); border: 0; border-radius: .5rem; cursor: pointer; }
+button.secundario { background: var(--suave); color: var(--texto); }
+.buscar { background: var(--suave); padding: .2rem 1rem 1rem; border-radius: .5rem; }
+.buscar .fila { display: flex; gap: .5rem; }
+.buscar .fila button { width: auto; margin-top: .3rem; padding: .6rem 1.2rem; }
+.buscar p { margin: .5rem 0 0; }
+.tarjeta { border: 2px solid var(--borde); border-radius: .6rem; padding: .8rem 1rem; margin-top: 1rem; }
+.cabeza { display: flex; justify-content: space-between; align-items: baseline; }
+.codigo { font-size: 1.8rem; font-weight: 800; letter-spacing: .3rem; margin: 0; }
+.hora { margin: 0; color: #4a5866; }
+.persona { font-size: 1.2rem; font-weight: 700; margin: .2rem 0 .4rem; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: .1rem 1rem; margin: 0; }
+dt { color: #4a5866; }
+dd { margin: 0; }
+.vacio { color: #4a5866; font-style: italic; }
+@media (min-width: 48rem) {
+  .tarjeta { display: grid; grid-template-columns: 9rem 1fr 14rem; gap: 1rem; align-items: center; }
+  .cabeza { flex-direction: column; }
+  .persona { grid-column: 2; margin: 0; }
+  .tarjeta dl { grid-column: 2; }
+  .tarjeta form { grid-column: 3; grid-row: 1 / span 2; }
+  .tarjeta form button { margin-top: 0; }
+}

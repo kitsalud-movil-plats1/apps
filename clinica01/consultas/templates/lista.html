@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% macro tarjeta(p, accion) %}
+<article class="tarjeta">
+  <div class="cabeza">
+    <p class="codigo">{{ p.codigo }}</p>
+    <p class="hora">{% if p.atendido_en %}Atendido {{ p.atendido_en.strftime('%H:%M') }}{% else %}{{ p.creado.strftime('%d/%m %H:%M') }}{% endif %}</p>
+  </div>
+  <p class="persona">{{ p.nombres }} {{ p.apellidos }}</p>
+  <dl>
+    <dt>Documento</dt><dd>{{ p.tipo_documento }}{% if p.numero_documento %} {{ p.numero_documento }}{% endif %}</dd>
+    {% if p.edad is not none %}<dt>Edad</dt><dd>{{ p.edad }} años</dd>{% endif %}
+    <dt>Motivo</dt><dd>{{ p.motivo }}</dd>
+    {% if p.detalle %}<dt>Detalle</dt><dd>{{ p.detalle }}</dd>{% endif %}
+    {% if p.celular %}<dt>Celular</dt><dd>{{ p.celular }}</dd>{% endif %}
+  </dl>
+  <form method="post" action="/atendido/{{ p.id }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="q" value="{{ busqueda }}">
+    {% if accion == 'marcar' %}
+    <button type="submit">Marcar como atendido</button>
+    {% else %}
+    <input type="hidden" name="accion" value="deshacer">
+    <button type="submit" class="secundario">Volver a pendientes</button>
+    {% endif %}
+  </form>
+</article>
+{% endmacro %}
+{% block contenido %}
+<form method="get" action="/" class="buscar">
+  <label for="q">Buscar por código o número de documento</label>
+  <div class="fila">
+    <input id="q" name="q" maxlength="20" value="{{ busqueda }}" autocapitalize="characters">
+    <button type="submit">Buscar</button>
+  </div>
+  {% if busqueda %}<p><a href="/">Ver todos</a></p>{% endif %}
+</form>
+
+{% if aviso %}<p class="aviso" role="alert">{{ aviso }}</p>{% endif %}
+
+<h1>Por atender ({{ pendientes | length }})</h1>
+<p><a href="{{ url_for('inicio', q=busqueda or None) }}">Actualizar la lista</a></p>
+{% for p in pendientes %}{{ tarjeta(p, 'marcar') }}{% else %}
+<p class="vacio">{% if busqueda %}No hay prerregistros pendientes con «{{ busqueda }}».{% else %}No hay prerregistros pendientes.{% endif %}</p>
+{% endfor %}
+
+<h2>Atendidos hoy ({{ atendidos | length }})</h2>
+{% for p in atendidos %}{{ tarjeta(p, 'deshacer') }}{% else %}
+<p class="vacio">Todavía no hay personas atendidas hoy.</p>
+{% endfor %}
+{% endblock %}

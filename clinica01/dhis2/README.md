@@ -6,7 +6,7 @@ Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD 
 |---|---|
 | [`compose.yml`](compose.yml) | `postgis/postgis:16-3.5` (límite 2 GB) y `dhis2/core:2.42.6.0` (límite 4 GB, heap `-Xms1g -Xmx2g`), healthchecks, `restart: unless-stopped` y DHIS2 solo en `127.0.0.1:8080`. PostgreSQL publica el 5432 solo en `10.20.20.11` y `[fd5a:fc7e:d716:20::11]` para los formularios y usa el `pg_hba.conf` que genera el rol. La red de Docker tiene subredes fijas (`172.30.0.0/24` y `fdc4:5a1d:7e20:1::/64`) con IPv6, así el 5432 publicado conserva la IP de origen en las dos familias |
 | [`dhis.conf`](dhis.conf) | Conexión a la base con `${DB_*}`, que DHIS2 toma de las variables de entorno, y `server.base.url = https://pacientes.salud.movil` con `server.https = on`. No lleva secretos |
-| [`prerregistro.sql`](prerregistro.sql) | Base `prerregistro` de los formularios (apps#6): tabla `prerregistros`, dueño `prerregistro_dueno` sin login y usuario `formularios` con solo `INSERT`. Idempotente |
+| [`prerregistro.sql`](prerregistro.sql) | Base `prerregistro` de los formularios (apps#6): tabla `prerregistros`, dueño `prerregistro_dueno` sin login, usuario `formularios` con solo `INSERT` y usuario `consultas` (apps#7) que lee y solo cambia `atendido` y `atendido_en`. Idempotente |
 | [`context.xml`](context.xml) | El `context.xml` de Tomcat de la imagen con `RemoteIpValve`, para que DHIS2 respete `X-Forwarded-Proto`, `X-Forwarded-Port` y `X-Forwarded-For` de Caddy. Sin él, DHIS2 redirige a `http://` |
 | [`metadatos/kit.json`](metadatos/kit.json) | Metadatos del kit con UID fijos (ver abajo) |
 | [`metadatos/pacientes-ficticios.json`](metadatos/pacientes-ficticios.json) | 20 pacientes ficticios (S-09) con su inscripción y una consulta |
@@ -29,15 +29,16 @@ Las cuentas son locales de DHIS2 y no dependen de AD; tienen los mismos nombres 
 
 ## PostgreSQL y los formularios
 
-La misma instancia de PostgreSQL guarda DHIS2 y los prerregistros de los formularios de comunidad01 (D-07, F-11), en bases separadas. `pg_hba.conf` (plantilla `pg_hba.conf.j2` del rol) rechaza todo lo que no está en esta tabla.
+La misma instancia de PostgreSQL guarda DHIS2 y los prerregistros de los formularios de comunidad01 (D-07, F-11), en bases separadas. La consulta de prerregistros ([`../consultas/`](../consultas/)) los lee desde la propia clinica01. `pg_hba.conf` (plantilla `pg_hba.conf.j2` del rol) rechaza todo lo que no está en esta tabla.
 
 | Base | Usuario | Desde | Para qué |
 |---|---|---|---|
 | `dhis2` | `dhis` | Red de Docker de DHIS2 | DHIS2 |
 | `prerregistro` | `formularios` | Solo comunidad01 (`10.20.20.12/32` y `fd5a:fc7e:d716:20::12/128`) | Insertar prerregistros. No puede leer, cambiar ni borrar |
+| `prerregistro` | `consultas` | Solo clinica01 (`10.20.20.11/32` y `fd5a:fc7e:d716:20::11/128`), porque la consulta usa la red del host | Leer los prerregistros y marcar `atendido` y `atendido_en`. No puede insertar ni borrar |
 | Todas | Todos | Socket local del contenedor | `docker exec` y el healthcheck |
 
-El 5432 publicado por Docker no pasa por ufw. Lo protegen `pg_hba.conf`, el usuario de solo `INSERT` y kit01, que no deja llegar a la Interna ni a la Comunidad al 5432; el filtro entre VMs en el bridge llega con network#10. Los prerregistros guardan la hora en UTC (`timestamptz`).
+El 5432 publicado por Docker no pasa por ufw. Lo protegen `pg_hba.conf`, los permisos de cada usuario y kit01, que no deja llegar a la Interna ni a la Comunidad al 5432; el filtro entre VMs en el bridge llega con network#10. Los prerregistros guardan la hora en UTC (`timestamptz`).
 
 ## Cómo se despliega
 
@@ -48,14 +49,14 @@ ansible-playbook playbooks/clinica01.yml                          # Docker, DHIS
 ansible-playbook playbooks/clinica01.yml -e dhis2_estado=stopped  # docker compose down; los datos quedan
 ```
 
-- **Archivos.** El rol copia `compose.yml`, `dhis.conf` y `context.xml` a `/srv/dhis2/` y genera `.env` con la contraseña de la base. Los datos quedan en `/srv/dhis2/postgres` y `/srv/dhis2/files` (este último del usuario `65534`, con el que corre la imagen). Si cambia `dhis.conf` o `context.xml` el rol reinicia `core`, porque van montados archivo por archivo.
+- **Archivos.** El rol copia `compose.yml`, `dhis.conf` y `context.xml` a `/srv/dhis2/` y genera `.env` con la contraseña de la base. Los datos quedan en `/srv/dhis2/postgres` y `/srv/dhis2/files` (este último del usuario `65534`, con el que corre la imagen). Si cambia `dhis.conf` o `context.xml` el rol reinicia `core`, porque van montados archivo por archivo. Si cambia `pg_hba.conf` reinicia `db` y espera a que `/api/me` responda con la clave de `admin`, porque `/api/system/ping` no toca la base y mientras DHIS2 recupera sus conexiones responde `401` a todo.
 - **Configuración por la API.** Se hace desde la VM contra `127.0.0.1:8080`, después de esperar a que `/api/system/ping` responda. Cada paso solo actúa si hace falta, así que una segunda ejecución termina con `changed=0`.
   - Si `admin` todavía tiene la clave de fábrica, la cambia por la del vault (`PUT /api/me/changePassword`).
   - Importa `kit.json` (`POST /api/metadata`, `CREATE_AND_UPDATE`) si el archivo cambió o si falta el programa (base nueva).
   - Crea las cuentas que falten. La clave solo se pone al crear la cuenta.
   - Le asigna a `admin` la unidad del kit para captura y búsqueda.
   - Carga los pacientes ficticios si falta `PacFict0001`.
-  - Crea la base `prerregistro`, su tabla y sus roles con `prerregistro.sql` si el archivo cambió o falta la base. La clave de `formularios` sale del vault (`vault_formularios_db_password`).
+  - Crea la base `prerregistro`, su tabla y sus roles con `prerregistro.sql` si el archivo cambió o falta la base. Las claves de `formularios` y `consultas` salen del vault (`vault_formularios_db_password` y `vault_consultas_db_password`).
 - **Cambio de la red de Docker.** Si cambian las subredes, Compose no puede recrear la red con los contenedores encima: antes hay que `docker compose down` en `/srv/dhis2` (los datos quedan).
 
 Docker y Compose vienen de los paquetes de Ubuntu (`docker.io` 29.1.3 y `docker-compose-v2` 2.40.3), retenidos con `hold`. Las imágenes se descargan por F-17 (las VMs salen a Internet por 80 y 443, solo IPv4).
@@ -96,7 +97,9 @@ kill %1
 | Desde la Interna, `curl -4` y `curl -6 --cacert <raíz> https://pacientes.salud.movil/` | `302` hacia `https://pacientes.salud.movil/dhis-web-login/` |
 | Como `ana.rojas`, `POST /api/tracker?async=false` con un paciente y `GET /api/tracker/trackedEntities?...&filter=AtrDocumen1:eq:<documento>` (P6) | `status OK` y el paciente con `createdBy` `ana.rojas` |
 | `cd /srv/dhis2 && sudo docker compose down && sudo docker compose up -d` y otra vez el conteo | El mismo número de pacientes |
-| `sudo docker exec dhis2-db-1 psql -U dhis -d prerregistro -c '\dp prerregistros'` | `formularios=a/prerregistro_dueno` |
+| `sudo docker exec dhis2-db-1 psql -U dhis -d prerregistro -c '\dp prerregistros'` | `formularios=a/prerregistro_dueno` y `consultas=r/prerregistro_dueno`, con `atendido` y `atendido_en` en `consultas=w` por columna |
+| En clinica01, `sudo docker run --rm -it --network host postgis/postgis:16-3.5 psql "host=10.20.20.11 dbname=prerregistro user=consultas"` (y con `fd5a:fc7e:d716:20::11`) con `SELECT`, `UPDATE` de `atendido` (con `ROLLBACK`), `INSERT`, `UPDATE` de otra columna y `DELETE` | El `SELECT` y el `UPDATE` de `atendido` funcionan; los otros dan `permission denied`. `inet_client_addr()` es la IP de clinica01 |
+| Desde comunidad01, el mismo `psql` con `user=consultas` | `pg_hba.conf rejects connection for host "10.20.20.12"` |
 | Desde comunidad01, `psql "host=10.20.20.11 dbname=prerregistro user=formularios"` (y con `fd5a:fc7e:d716:20::11`) e `INSERT`, `SELECT` y `DELETE` | Solo el `INSERT` funciona; los otros dan `permission denied` |
 | Desde comunidad01, `psql "host=10.20.20.11 dbname=dhis2 user=dhis"` | `pg_hba.conf rejects connection for host "10.20.20.12"` |
 | `sudo docker stats --no-stream` | Memoria de cada contenedor dentro de su límite |
@@ -109,6 +112,7 @@ kill %1
 - **No descarga las imágenes.** Revisar la salida a Internet de las VMs (F-17) y el DNS (`resolvectl query registry-1.docker.io`).
 - **`no pg_hba.conf entry` o `pg_hba.conf rejects connection`.** El origen, la base o el usuario no están en `pg_hba.conf`. `sudo docker exec dhis2-db-1 psql -U dhis -d dhis2 -c 'select * from pg_hba_file_rules'` muestra las reglas cargadas.
 - **El 5432 por IPv6 llega con la IP de la red de Docker.** La red no tiene IPv6 (`docker network inspect dhis2_default`) y Docker usa su proxy, que cambia el origen.
+- **El rol falla al cambiar la clave de fábrica de `admin` con `401` justo después de reiniciar `db`.** DHIS2 todavía no había recuperado sus conexiones. El rol ya espera a `/api/me`; si pasa igual, se vuelve a ejecutar el playbook.
 - **`files` sin permisos.** `/srv/dhis2/files` tiene que ser del usuario `65534`.
 - **Después del login el navegador va a `http://` o pierde el puerto del túnel.** Falta el `RemoteIpValve` (`sudo docker exec dhis2-core-1 cat /usr/local/tomcat/conf/context.xml`) o Caddy no manda `X-Forwarded-Port`.
 - **La API responde `409` al crear una cuenta o cambiar una clave.** El mensaje dice qué regla de la política falla, por ejemplo `Password must not have any generic word`. Se prueba una clave con `curl -u admin:<clave> -X POST http://127.0.0.1:8080/api/account/validatePassword --data-urlencode password=<clave nueva>`.

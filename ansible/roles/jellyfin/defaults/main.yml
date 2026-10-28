@@ -1,0 +1,7 @@
+---
+# Jellyfin en comunidad01 (R7, D-08, apps#5)
+jellyfin_dir: /srv/jellyfin
+# Bibliotecas, una carpeta por cada una (salud y comunidad)
+jellyfin_medios_dir: /srv/medios/videos
+# Archivos del repositorio apps que se copian tal cual
+jellyfin_fuente: "{{ role_path }}/../../../comunidad01/jellyfin"

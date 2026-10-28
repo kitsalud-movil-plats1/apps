@@ -1,0 +1,23 @@
+---
+- name: Carpetas de las bibliotecas
+  ansible.builtin.file:
+    path: "{{ jellyfin_medios_dir }}/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: ["", salud, comunidad]
+
+# Solo se descargan si faltan o no coinciden con el sha256 (F-17, solo IPv4)
+- name: Audio y video de las bibliotecas
+  ansible.builtin.get_url:
+    url: "{{ contenido_medios_origen }}/{{ item.origen }}"
+    dest: "{{ jellyfin_medios_dir }}/{{ item.biblioteca }}/{{ item.archivo }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    owner: root
+    group: root
+    mode: "0644"
+    timeout: 120
+  loop: "{{ contenido_medios }}"
+  loop_control:
+    label: "{{ item.biblioteca }}/{{ item.archivo }}"

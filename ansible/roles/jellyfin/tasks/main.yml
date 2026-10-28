@@ -21,3 +21,47 @@
   loop: "{{ contenido_medios }}"
   loop_control:
     label: "{{ item.biblioteca }}/{{ item.archivo }}"
+
+- name: Directorio del Compose
+  ansible.builtin.file:
+    path: "{{ jellyfin_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configuración y caché, del usuario del contenedor
+  ansible.builtin.file:
+    path: "{{ jellyfin_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ jellyfin_uid }}"
+    group: "{{ jellyfin_uid }}"
+    mode: "0750"
+  loop: [config, cache]
+
+- name: Compose del repositorio apps
+  ansible.builtin.copy:
+    src: "{{ jellyfin_fuente }}/compose.yml"
+    dest: "{{ jellyfin_dir }}/compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Levantar Jellyfin
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ jellyfin_dir }}"
+  register: jellyfin_up
+  changed_when: jellyfin_up.stderr is search('Creat|Recreat|Start')
+
+- name: Esperar a que Jellyfin responda
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/health"
+    return_content: true
+  register: jellyfin_salud
+  until: jellyfin_salud.content | default('') == 'Healthy'
+  retries: 30
+  delay: 5
+
+- name: Asistente, red, bibliotecas y usuarios
+  ansible.builtin.import_tasks: configuracion.yml

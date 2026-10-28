@@ -1,0 +1,18 @@
+# Jellyfin en comunidad01 (R7, D-08, sección 10.5). Audio y video de salud y
+# para la comunidad, sin transcodificar; Caddy publica videos.salud.movil.
+name: jellyfin
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12.3.20261023-013714
+    restart: unless-stopped
+    # Red del host, como Caddy: Jellyfin ve la IP real del cliente en
+    # X-Forwarded-For (v4 y v6) y decide si es de la Interna. El rol lo deja
+    # escuchando solo en 127.0.0.1:8096
+    network_mode: host
+    user: "10020:10020"
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /srv/medios/videos:/media:ro
+    mem_limit: 1g

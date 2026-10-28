@@ -29,6 +29,13 @@ http://biblioteca.salud.movil {
 	log
 }
 
+# Videos y audios de Jellyfin (apps#5). Caddy manda la IP del cliente en
+# X-Forwarded-For y no deja que el cliente la falsee
+http://videos.salud.movil {
+	reverse_proxy 127.0.0.1:8096
+	log
+}
+
 # Raíz de la CA del kit para instalarla en los equipos (apps#3)
 http://ca.salud.movil {
 	root * /srv/publica

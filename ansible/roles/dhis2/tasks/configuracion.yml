@@ -151,6 +151,34 @@
   changed_when: true
   failed_when: dhis2_ficticios.json.status | default('') != 'OK'
 
+# Varias semanas de consultas para el dashboard de la brigada (apps#12). El
+# archivo lo genera metadatos/generar-demostracion.py y se importa completo o
+# nada (atomicMode ALL)
+- name: Pacientes de demostración presentes
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/tracker/trackedEntities/PacDemo0001?fields=trackedEntity"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: dhis2_demostracion_hoy
+  no_log: true
+
+- name: Cargar los pacientes de demostración
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/tracker?async=false&importStrategy=CREATE_AND_UPDATE&atomicMode=ALL"
+    method: POST
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ lookup('ansible.builtin.file', dhis2_fuente ~ '/metadatos/pacientes-demostracion.json') | from_json }}"
+    timeout: 600
+  register: dhis2_demostracion
+  when: dhis2_demostracion_hoy.status == 404
+  changed_when: true
+  failed_when: dhis2_demostracion.json.status | default('') != 'OK'
+
 - name: SQL de la base de prerregistro en la VM
   ansible.builtin.copy:
     src: "{{ dhis2_fuente }}/prerregistro.sql"

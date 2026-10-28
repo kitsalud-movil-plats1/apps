@@ -23,6 +23,31 @@
      "id": "OptSexoOtr1"
     }
    ]
+  },
+  {
+   "id": "OptSetMoti1",
+   "name": "Motivo principal",
+   "valueType": "TEXT",
+   "options": [
+    {
+     "id": "OptMotCont1"
+    },
+    {
+     "id": "OptMotFieb1"
+    },
+    {
+     "id": "OptMotDolo1"
+    },
+    {
+     "id": "OptMotEmba1"
+    },
+    {
+     "id": "OptMotVacu1"
+    },
+    {
+     "id": "OptMotOtro1"
+    }
+   ]
   }
  ],
  "options": [
@@ -51,6 +76,60 @@
    "sortOrder": 3,
    "optionSet": {
     "id": "OptSetSexo1"
+   }
+  },
+  {
+   "id": "OptMotCont1",
+   "code": "CONTROL",
+   "name": "Control o revisión",
+   "sortOrder": 1,
+   "optionSet": {
+    "id": "OptSetMoti1"
+   }
+  },
+  {
+   "id": "OptMotFieb1",
+   "code": "FIEBRE",
+   "name": "Fiebre o malestar",
+   "sortOrder": 2,
+   "optionSet": {
+    "id": "OptSetMoti1"
+   }
+  },
+  {
+   "id": "OptMotDolo1",
+   "code": "DOLOR",
+   "name": "Dolor",
+   "sortOrder": 3,
+   "optionSet": {
+    "id": "OptSetMoti1"
+   }
+  },
+  {
+   "id": "OptMotEmba1",
+   "code": "EMBARAZO",
+   "name": "Embarazo",
+   "sortOrder": 4,
+   "optionSet": {
+    "id": "OptSetMoti1"
+   }
+  },
+  {
+   "id": "OptMotVacu1",
+   "code": "VACUNACION",
+   "name": "Vacunación",
+   "sortOrder": 5,
+   "optionSet": {
+    "id": "OptSetMoti1"
+   }
+  },
+  {
+   "id": "OptMotOtro1",
+   "code": "OTRO",
+   "name": "Otro motivo",
+   "sortOrder": 6,
+   "optionSet": {
+    "id": "OptSetMoti1"
    }
   }
  ],
@@ -101,6 +180,17 @@
  ],
  "dataElements": [
   {
+   "id": "DeMotivoPr1",
+   "name": "Motivo principal",
+   "shortName": "Motivo principal",
+   "valueType": "TEXT",
+   "domainType": "TRACKER",
+   "aggregationType": "NONE",
+   "optionSet": {
+    "id": "OptSetMoti1"
+   }
+  },
+  {
    "id": "DeMotivoCo1",
    "name": "Motivo de consulta",
    "shortName": "Motivo de consulta",
@@ -149,7 +239,9 @@
     "M_dhis-web-capture",
     "M_dhis-web-dashboard",
     "F_TRACKED_ENTITY_ADD",
-    "F_TRACKED_ENTITY_UPDATE"
+    "F_TRACKED_ENTITY_UPDATE",
+    "F_VIEW_EVENT_ANALYTICS",
+    "M_dhis-web-data-visualizer"
    ]
   },
   {
@@ -320,31 +412,38 @@
    "programStageDataElements": [
     {
      "dataElement": {
+      "id": "DeMotivoPr1"
+     },
+     "compulsory": false,
+     "sortOrder": 1
+    },
+    {
+     "dataElement": {
       "id": "DeMotivoCo1"
      },
      "compulsory": true,
-     "sortOrder": 1
+     "sortOrder": 2
     },
     {
      "dataElement": {
       "id": "DePesoKg001"
      },
      "compulsory": false,
-     "sortOrder": 2
+     "sortOrder": 3
     },
     {
      "dataElement": {
       "id": "DeTempera01"
      },
      "compulsory": false,
-     "sortOrder": 3
+     "sortOrder": 4
     },
     {
      "dataElement": {
       "id": "DeObserva01"
      },
      "compulsory": false,
-     "sortOrder": 4
+     "sortOrder": 5
     }
    ]
   }

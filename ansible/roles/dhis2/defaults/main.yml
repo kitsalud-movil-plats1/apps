@@ -16,6 +16,8 @@ dhis2_api: http://127.0.0.1:8080/api
 dhis2_ou: KitSalud001
 dhis2_grupo: GrpPersCli1
 dhis2_programa: ProgAtenPr1
+# Indicador de metadatos/brigada.json que marca si ya se importó (apps#12)
+dhis2_indicador_brigada: PiAtenTot01
 # Clave de fábrica de admin, solo para cambiarla en el primer arranque
 dhis2_admin_fabrica: district
 
@@ -29,3 +31,12 @@ dhis2_prerregistro_db: prerregistro
 dhis2_prerregistro_usuario: formularios
 # Usuario de la consulta de prerregistros (apps#7): lee y marca atendido
 dhis2_consultas_usuario: consultas
+
+# Tablas analíticas del dashboard de la brigada (apps#12): trabajo continuo
+# cada 30 minutos y actualización completa a las 2:00
+dhis2_analitica_trabajo: TrabAnalit1
+dhis2_analitica_cada: 1800
+dhis2_analitica_parametros:
+  fullUpdateHourOfDay: 2
+  lastYears: 2
+  skipOutliers: true

@@ -4,7 +4,7 @@ Aplicaciones del kit desplegadas con Docker Compose dentro de las VMs.
 
 | Ruta | VM | Servicio | Nombre |
 |---|---|---|---|
-| `clinica01/dhis2/` | clinica01 | DHIS2 + PostgreSQL (también guarda los formularios), con el programa tracker, las cuentas locales y los pacientes ficticios | `pacientes.salud.movil` |
+| `clinica01/dhis2/` | clinica01 | DHIS2 + PostgreSQL (también guarda los formularios), con el programa tracker, las cuentas locales, los pacientes ficticios y el dashboard "Brigada de salud" | `pacientes.salud.movil` |
 | `clinica01/caddy/` | clinica01 | Reverse proxy con HTTPS (CA interna) para `pacientes` y `consultas` | - |
 | `clinica01/consultas/` | clinica01 | Consulta de prerregistros (Flask) con login LDAPS contra Samba AD, solo para el grupo `clinicos`; lee la base y marca a quién se atendió | `consultas.salud.movil` |
 | `comunidad01/caddy/` | comunidad01 | Reverse proxy; HTTPS con la CA interna para `registro`, HTTP para el contenido público | - |

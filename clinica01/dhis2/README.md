@@ -10,6 +10,9 @@ Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD 
 | [`context.xml`](context.xml) | El `context.xml` de Tomcat de la imagen con `RemoteIpValve`, para que DHIS2 respete `X-Forwarded-Proto`, `X-Forwarded-Port` y `X-Forwarded-For` de Caddy. Sin él, DHIS2 redirige a `http://` |
 | [`metadatos/kit.json`](metadatos/kit.json) | Metadatos del kit con UID fijos (ver abajo) |
 | [`metadatos/pacientes-ficticios.json`](metadatos/pacientes-ficticios.json) | 20 pacientes ficticios (S-09) con su inscripción y una consulta |
+| [`metadatos/pacientes-demostracion.json`](metadatos/pacientes-demostracion.json) | 200 pacientes ficticios de demostración (`PacDemo0001` a `PacDemo0200`, documentos `DEMO-0001`…) con 300 consultas entre el 21 de septiembre y el 27 de octubre de 2026, para el dashboard de la brigada (apps#12) |
+| [`metadatos/generar-demostracion.py`](metadatos/generar-demostracion.py) | Genera el archivo anterior con una semilla fija; ejecutarlo otra vez da el mismo archivo. No corre en la VM |
+| [`metadatos/brigada.json`](metadatos/brigada.json) | Indicadores de programa, visualizaciones y el dashboard "Brigada de salud", con UID fijos (ver abajo) |
 | [`.env.example`](.env.example) | Variables que lee Compose (`DATOS`, `DB_*`, las subredes `RED4`/`RED6` y las IP de publicación `IP4`/`IP6`). El `.env` real lo genera Ansible desde el inventario y el vault, con permisos `600` |
 | [`prueba-humo/`](prueba-humo/) | `carga.py` y `medir.sh` de la prueba de humo (apps#1) |
 
@@ -20,10 +23,10 @@ Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD 
 | Unidad organizativa | Kit de salud móvil (`KitSalud001`) |
 | Tipo de entidad | Paciente, con nombre, apellido, documento (único), fecha de nacimiento y sexo (femenino, masculino u otro) |
 | Programa tracker | Atención primaria (`ProgAtenPr1`), con registro y una inscripción por paciente. Los primeros tres atributos son obligatorios |
-| Etapa | Consulta, repetible, con motivo de consulta (obligatorio), peso (kg), temperatura (°C) y observaciones |
+| Etapa | Consulta, repetible, con motivo principal (opcional, con las mismas opciones del prerregistro: control o revisión, fiebre o malestar, dolor, embarazo, vacunación u otro), motivo de consulta (texto, obligatorio), peso (kg), temperatura (°C) y observaciones |
 | Acceso | Los metadatos son de lectura pública para las cuentas. Los datos de pacientes solo los leen y escriben las cuentas del grupo "Personal clínico" (`GrpPersCli1`) |
-| Roles | "Personal clínico" (app Capture y dashboard, registrar y actualizar pacientes) y "Administrador" (todas las autoridades) |
-| Cuentas | `admin` (superusuario de la imagen), `ana.rojas` y `carlos.perez` con "Personal clínico", `laura.gomez` con "Administrador". Las tres del personal están en el grupo y en la unidad del kit |
+| Roles | "Personal clínico" (apps Capture, Dashboard y Data Visualizer, registrar y actualizar pacientes, y ver la analítica de eventos) y "Administrador" (todas las autoridades) |
+| Cuentas | `admin` (superusuario de la imagen), `ana.rojas` y `carlos.perez` con "Personal clínico", `laura.gomez` con "Administrador". Las tres del personal están en el grupo y en la unidad del kit. `kit.json` define el grupo sin miembros, así que cada importación lo vacía y el rol vuelve a meter a cada cuenta |
 
 Las cuentas son locales de DHIS2 y no dependen de AD; tienen los mismos nombres que en el dominio para que sea fácil saber quién es quién. Las contraseñas están en el vault (`vault_dhis2_admin_password` y `vault_dhis2_usuarios_password`) y siguen la convención del grupo (R-14). La política de DHIS2 exige mayúscula, número y símbolo y rechaza palabras genéricas como `password` o `admin` (`Password must not have any generic word`), así que usa la clave alternativa de la convención.
 
@@ -55,11 +58,44 @@ ansible-playbook playbooks/clinica01.yml -e dhis2_estado=stopped  # docker compo
   - Importa `kit.json` (`POST /api/metadata`, `CREATE_AND_UPDATE`) si el archivo cambió o si falta el programa (base nueva).
   - Crea las cuentas que falten. La clave solo se pone al crear la cuenta.
   - Le asigna a `admin` la unidad del kit para captura y búsqueda.
-  - Carga los pacientes ficticios si falta `PacFict0001`.
+  - Vuelve a meter a cada cuenta del personal en el grupo "Personal clínico" si no está.
+  - Carga los pacientes ficticios si falta `PacFict0001`, y los de demostración si falta `PacDemo0001` (`atomicMode=ALL`, todo o nada).
+  - Importa `brigada.json` si el archivo cambió o si falta el indicador `PiAtenTot01`.
+  - Crea el trabajo de las tablas analíticas (`TrabAnalit1`) si falta, o lo actualiza si cambiaron su intervalo o sus parámetros.
   - Crea la base `prerregistro`, su tabla y sus roles con `prerregistro.sql` si el archivo cambió o falta la base. Las claves de `formularios` y `consultas` salen del vault (`vault_formularios_db_password` y `vault_consultas_db_password`).
 - **Cambio de la red de Docker.** Si cambian las subredes, Compose no puede recrear la red con los contenedores encima: antes hay que `docker compose down` en `/srv/dhis2` (los datos quedan).
 
 Docker y Compose vienen de los paquetes de Ubuntu (`docker.io` 29.1.3 y `docker-compose-v2` 2.40.3), retenidos con `hold`. Las imágenes se descargan por F-17 (las VMs salen a Internet por 80 y 443, solo IPv4).
+
+## Dashboard de la brigada (apps#12)
+
+El dashboard **Brigada de salud** muestra cómo va la jornada. Lo ve el grupo "Personal clínico" desde la app Dashboard, y cada elemento se puede abrir en Data Visualizer.
+
+| Elemento | Tipo | Periodo |
+|---|---|---|
+| Atenciones hoy | Cifra | Hoy |
+| Atenciones esta semana | Cifra | Esta semana |
+| Consultas con fiebre esta semana | Cifra | Esta semana |
+| Atenciones por sexo | Torta | Últimas 12 semanas y la actual |
+| Atenciones por día | Columnas | Los 14 días anteriores a hoy |
+| Atenciones y pacientes nuevos por semana | Líneas | Las 12 semanas anteriores a esta |
+| Motivos de consulta | Barras | Últimas 12 semanas y la actual |
+| Atenciones por edad | Columnas | Últimas 12 semanas y la actual |
+
+Los periodos relativos de DHIS2 no incluyen el periodo en curso (`LAST_12_WEEKS` no trae esta semana y `LAST_14_DAYS` no trae hoy). Donde el periodo es filtro (sexo, motivos y edad) se suma `thisWeek`. En los gráficos por periodo, DHIS2 pondría el periodo en curso al principio del eje, así que esos muestran solo periodos completos, y hoy y esta semana van en las cifras de arriba.
+
+**Indicadores de programa.** Todos son de tipo `EVENT` y cuentan consultas (`V{event_count}`), salvo "Pacientes nuevos", que es `ENROLLMENT` y cuenta inscripciones. Cada uno lleva sus límites de periodo (`analyticsPeriodBoundaries`) por la fecha de la consulta o de la inscripción.
+
+| Indicador | Filtro |
+|---|---|
+| Atenciones (`PiAtenTot01`) | Ninguno |
+| Pacientes nuevos (`PiPacNuev01`) | Ninguno |
+| Consultas con fiebre (`PiFiebre001`) | Temperatura de 38 °C o más |
+| Atenciones de mujeres, hombres y otro sexo (`PiSexo*`) | Atributo sexo |
+| Atenciones de 0 a 4, 5 a 14, 15 a 49 y 50 años o más (`PiEdad*`) | `d2:yearsBetween` entre la fecha de nacimiento y la de la consulta |
+| Motivo: control o revisión, fiebre o malestar, dolor, embarazo, vacunación u otro (`PiMot*`) | Motivo principal |
+
+**Tablas analíticas (R-03).** El trabajo **Tablas analíticas de la brigada** (`TrabAnalit1`, `CONTINUOUS_ANALYTICS_TABLE`) recalcula el periodo más reciente cada 30 minutos y todas las tablas a las 2:00, así que el dashboard va como mucho media hora atrás. Usa `skipOutliers: true` porque el kit no tiene datos agregados. Con 221 pacientes y 321 consultas, la generación completa tardó 4,6 s y dejó a `core` en 1861 MiB de 4096 y a `db` en 140 MiB de 2048. Una pasada del trabajo continuo tardó 3,9 s con picos de 1900 y 165 MiB. Bajo demanda se generan desde la app Data Administration o con `POST /api/resourceTables/analytics`.
 
 ## Cómo se accede
 
@@ -93,7 +129,11 @@ kill %1
 | `sudo docker compose -f /srv/dhis2/compose.yml ps` | `dhis2-db-1` y `dhis2-core-1` en `healthy` |
 | `curl -s -u <usuario>:<clave> http://127.0.0.1:8080/api/system/info` | JSON con `"version":"2.42.6"` |
 | `curl -s -o /dev/null -w '%{http_code}' -u admin:district http://127.0.0.1:8080/api/me` | `401` (la clave de fábrica ya no sirve) |
-| `curl -gs -u admin:<clave> 'http://127.0.0.1:8080/api/tracker/trackedEntities?program=ProgAtenPr1&orgUnits=KitSalud001&pageSize=1&totalPages=true'` | `pager.total` de 20 o más |
+| `curl -gs -u admin:<clave> 'http://127.0.0.1:8080/api/tracker/trackedEntities?program=ProgAtenPr1&orgUnits=KitSalud001&pageSize=1&totalPages=true'` | `pager.total` de 220 o más |
+| `curl -gs -u admin:<clave> 'http://127.0.0.1:8080/api/users?filter=username:eq:ana.rojas&fields=userGroups[name]'` | `Personal clínico` |
+| Como `ana.rojas`, `GET /api/analytics?dimension=dx:PiAtenTot01;PiFiebre001;PiPacNuev01&filter=pe:2026&filter=ou:KitSalud001` y el mismo conteo por `/api/tracker/trackedEntities` | Las mismas cifras (los 16 indicadores coinciden) |
+| `ana.rojas` registra una consulta hoy, `POST /api/jobConfigurations/TrabAnalit1/execute` y `GET /api/analytics?dimension=dx:PiAtenTot01&filter=pe:TODAY&filter=ou:KitSalud001` | Sube en 1 |
+| En `https://pacientes.salud.movil`, como `ana.rojas`, la app Dashboard | **Brigada de salud** con sus 8 elementos y datos |
 | Desde la Interna, `curl -4` y `curl -6 --cacert <raíz> https://pacientes.salud.movil/` | `302` hacia `https://pacientes.salud.movil/dhis-web-login/` |
 | Como `ana.rojas`, `POST /api/tracker?async=false` con un paciente y `GET /api/tracker/trackedEntities?...&filter=AtrDocumen1:eq:<documento>` (P6) | `status OK` y el paciente con `createdBy` `ana.rojas` |
 | `cd /srv/dhis2 && sudo docker compose down && sudo docker compose up -d` y otra vez el conteo | El mismo número de pacientes |
@@ -113,6 +153,12 @@ kill %1
 - **`no pg_hba.conf entry` o `pg_hba.conf rejects connection`.** El origen, la base o el usuario no están en `pg_hba.conf`. `sudo docker exec dhis2-db-1 psql -U dhis -d dhis2 -c 'select * from pg_hba_file_rules'` muestra las reglas cargadas.
 - **El 5432 por IPv6 llega con la IP de la red de Docker.** La red no tiene IPv6 (`docker network inspect dhis2_default`) y Docker usa su proxy, que cambia el origen.
 - **El rol falla al cambiar la clave de fábrica de `admin` con `401` justo después de reiniciar `db`.** DHIS2 todavía no había recuperado sus conexiones. El rol ya espera a `/api/me`; si pasa igual, se vuelve a ejecutar el playbook.
+- **Un indicador de consultas sale vacío y el log de `core` dice `bad SQL grammar [... where and ...]`.** Al indicador le faltan los `analyticsPeriodBoundaries`, que la interfaz agrega sola y la API no. Están en `brigada.json`.
+- **El dashboard dice que el usuario no puede ver la analítica de eventos (`User is not allowed to view event analytics data`).** Al rol le falta `F_VIEW_EVENT_ANALYTICS`.
+- **`ana.rojas` o `carlos.perez` no pueden leer datos del programa (`not allowed to read data for Program`).** No están en el grupo "Personal clínico". Una importación de `kit.json` vacía el grupo; se vuelve a ejecutar el playbook.
+- **El trabajo de las tablas analíticas termina en milisegundos y el log dice `job parameters not aligned with existing outlier data`.** `skipOutliers` del trabajo no coincide con el de la última generación. El rol lo deja en `true`, que coincide con `POST /api/resourceTables/analytics` sin parámetros.
+- **Una cifra dice `A end date was not specified in periods, dimensions, filters`.** La visualización no tiene un periodo válido. En `relativePeriods` "hoy" se llama `thisDay` (en la API de analítica es `TODAY`).
+- **El dashboard no muestra lo de hoy.** El trabajo continuo corre cada 30 minutos (`GET /api/jobConfigurations/TrabAnalit1?fields=lastExecuted,lastExecutedStatus`). Para no esperar, se ejecuta a mano.
 - **`files` sin permisos.** `/srv/dhis2/files` tiene que ser del usuario `65534`.
 - **Después del login el navegador va a `http://` o pierde el puerto del túnel.** Falta el `RemoteIpValve` (`sudo docker exec dhis2-core-1 cat /usr/local/tomcat/conf/context.xml`) o Caddy no manda `X-Forwarded-Port`.
 - **La API responde `409` al crear una cuenta o cambiar una clave.** El mensaje dice qué regla de la política falla, por ejemplo `Password must not have any generic word`. Se prueba una clave con `curl -u admin:<clave> -X POST http://127.0.0.1:8080/api/account/validatePassword --data-urlencode password=<clave nueva>`.

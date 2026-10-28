@@ -972,102 +972,6 @@
    }
   }
  ],
- "eventVisualizations": [
-  {
-   "id": "LlConsult01",
-   "name": "Últimas consultas",
-   "type": "LINE_LIST",
-   "outputType": "EVENT",
-   "legacy": false,
-   "description": "Consultas de hoy y de las últimas dos semanas, de la más reciente a la más antigua",
-   "program": {
-    "id": "ProgAtenPr1"
-   },
-   "programStage": {
-    "id": "EtapaConsu1"
-   },
-   "organisationUnits": [
-    {
-     "id": "KitSalud001"
-    }
-   ],
-   "columnDimensions": [
-    "eventDate",
-    "AtrNombre01",
-    "AtrApellid1",
-    "EtapaConsu1.DeMotivoPr1",
-    "EtapaConsu1.DeMotivoCo1",
-    "EtapaConsu1.DeTempera01"
-   ],
-   "filterDimensions": [
-    "ou"
-   ],
-   "simpleDimensions": [
-    {
-     "parent": "COLUMN",
-     "dimension": "eventDate",
-     "values": [
-      "TODAY",
-      "LAST_14_DAYS"
-     ]
-    }
-   ],
-   "attributeDimensions": [
-    {
-     "attribute": {
-      "id": "AtrNombre01"
-     }
-    },
-    {
-     "attribute": {
-      "id": "AtrApellid1"
-     }
-    }
-   ],
-   "dataElementDimensions": [
-    {
-     "dataElement": {
-      "id": "DeMotivoPr1"
-     },
-     "programStage": {
-      "id": "EtapaConsu1"
-     }
-    },
-    {
-     "dataElement": {
-      "id": "DeMotivoCo1"
-     },
-     "programStage": {
-      "id": "EtapaConsu1"
-     }
-    },
-    {
-     "dataElement": {
-      "id": "DeTempera01"
-     },
-     "programStage": {
-      "id": "EtapaConsu1"
-     }
-    }
-   ],
-   "sorting": [
-    {
-     "dimension": "eventDate",
-     "direction": "DESC"
-    }
-   ],
-   "sharing": {
-    "public": "r-------",
-    "external": false,
-    "userGroups": {
-     "GrpPersCli1": {
-      "id": "GrpPersCli1",
-      "access": "r-------"
-     }
-    }
-   }
-  }
- ],
  "dashboards": [
   {
    "id": "DashBrigad1",
@@ -1161,17 +1065,6 @@
      "y": 32,
      "width": 30,
      "height": 20
-    },
-    {
-     "id": "DiConsult01",
-     "type": "EVENT_VISUALIZATION",
-     "eventVisualization": {
-      "id": "LlConsult01"
-     },
-     "x": 0,
-     "y": 52,
-     "width": 60,
-     "height": 25
     }
    ],
    "sharing": {

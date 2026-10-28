@@ -12,7 +12,7 @@ Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD 
 | [`metadatos/pacientes-ficticios.json`](metadatos/pacientes-ficticios.json) | 20 pacientes ficticios (S-09) con su inscripción y una consulta |
 | [`metadatos/pacientes-demostracion.json`](metadatos/pacientes-demostracion.json) | 200 pacientes ficticios de demostración (`PacDemo0001` a `PacDemo0200`, documentos `DEMO-0001`…) con 300 consultas entre el 21 de septiembre y el 27 de octubre de 2026, para el dashboard de la brigada (apps#12) |
 | [`metadatos/generar-demostracion.py`](metadatos/generar-demostracion.py) | Genera el archivo anterior con una semilla fija; ejecutarlo otra vez da el mismo archivo. No corre en la VM |
-| [`metadatos/brigada.json`](metadatos/brigada.json) | Indicadores de programa, visualizaciones, la lista de consultas y el dashboard "Brigada de salud", con UID fijos (ver abajo) |
+| [`metadatos/brigada.json`](metadatos/brigada.json) | Indicadores de programa, visualizaciones y el dashboard "Brigada de salud", con UID fijos (ver abajo) |
 | [`.env.example`](.env.example) | Variables que lee Compose (`DATOS`, `DB_*`, las subredes `RED4`/`RED6` y las IP de publicación `IP4`/`IP6`). El `.env` real lo genera Ansible desde el inventario y el vault, con permisos `600` |
 | [`prueba-humo/`](prueba-humo/) | `carga.py` y `medir.sh` de la prueba de humo (apps#1) |
 
@@ -25,7 +25,7 @@ Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD 
 | Programa tracker | Atención primaria (`ProgAtenPr1`), con registro y una inscripción por paciente. Los primeros tres atributos son obligatorios |
 | Etapa | Consulta, repetible, con motivo principal (opcional, con las mismas opciones del prerregistro: control o revisión, fiebre o malestar, dolor, embarazo, vacunación u otro), motivo de consulta (texto, obligatorio), peso (kg), temperatura (°C) y observaciones |
 | Acceso | Los metadatos son de lectura pública para las cuentas. Los datos de pacientes solo los leen y escriben las cuentas del grupo "Personal clínico" (`GrpPersCli1`) |
-| Roles | "Personal clínico" (apps Capture, Dashboard, Data Visualizer y Line Listing, registrar y actualizar pacientes, y ver la analítica de eventos) y "Administrador" (todas las autoridades) |
+| Roles | "Personal clínico" (apps Capture, Dashboard y Data Visualizer, registrar y actualizar pacientes, y ver la analítica de eventos) y "Administrador" (todas las autoridades) |
 | Cuentas | `admin` (superusuario de la imagen), `ana.rojas` y `carlos.perez` con "Personal clínico", `laura.gomez` con "Administrador". Las tres del personal están en el grupo y en la unidad del kit. `kit.json` define el grupo sin miembros, así que cada importación lo vacía y el rol vuelve a meter a cada cuenta |
 
 Las cuentas son locales de DHIS2 y no dependen de AD; tienen los mismos nombres que en el dominio para que sea fácil saber quién es quién. Las contraseñas están en el vault (`vault_dhis2_admin_password` y `vault_dhis2_usuarios_password`) y siguen la convención del grupo (R-14). La política de DHIS2 exige mayúscula, número y símbolo y rechaza palabras genéricas como `password` o `admin` (`Password must not have any generic word`), así que usa la clave alternativa de la convención.
@@ -69,7 +69,7 @@ Docker y Compose vienen de los paquetes de Ubuntu (`docker.io` 29.1.3 y `docker-
 
 ## Dashboard de la brigada (apps#12)
 
-El dashboard **Brigada de salud** muestra cómo va la jornada. Lo ve el grupo "Personal clínico" desde la app Dashboard, y todos sus elementos se pueden abrir en Data Visualizer o Line Listing.
+El dashboard **Brigada de salud** muestra cómo va la jornada. Lo ve el grupo "Personal clínico" desde la app Dashboard, y cada elemento se puede abrir en Data Visualizer.
 
 | Elemento | Tipo | Periodo |
 |---|---|---|
@@ -81,7 +81,6 @@ El dashboard **Brigada de salud** muestra cómo va la jornada. Lo ve el grupo "P
 | Atenciones y pacientes nuevos por semana | Líneas | Las 12 semanas anteriores a esta |
 | Motivos de consulta | Barras | Últimas 12 semanas y la actual |
 | Atenciones por edad | Columnas | Últimas 12 semanas y la actual |
-| Últimas consultas | Lista (fecha, nombre, apellido, motivo principal, motivo y temperatura) | Últimos 14 días y hoy, de la más reciente a la más antigua |
 
 Los periodos relativos de DHIS2 no incluyen el periodo en curso (`LAST_12_WEEKS` no trae esta semana y `LAST_14_DAYS` no trae hoy). Donde el periodo es filtro (sexo, motivos y edad) se suma `thisWeek`. En los gráficos por periodo, DHIS2 pondría el periodo en curso al principio del eje, así que esos muestran solo periodos completos, y hoy y esta semana van en las cifras de arriba.
 
@@ -133,9 +132,8 @@ kill %1
 | `curl -gs -u admin:<clave> 'http://127.0.0.1:8080/api/tracker/trackedEntities?program=ProgAtenPr1&orgUnits=KitSalud001&pageSize=1&totalPages=true'` | `pager.total` de 220 o más |
 | `curl -gs -u admin:<clave> 'http://127.0.0.1:8080/api/users?filter=username:eq:ana.rojas&fields=userGroups[name]'` | `Personal clínico` |
 | Como `ana.rojas`, `GET /api/analytics?dimension=dx:PiAtenTot01;PiFiebre001;PiPacNuev01&filter=pe:2026&filter=ou:KitSalud001` y el mismo conteo por `/api/tracker/trackedEntities` | Las mismas cifras (los 16 indicadores coinciden) |
-| Como `ana.rojas`, `GET /api/analytics/events/query/ProgAtenPr1?stage=EtapaConsu1&dimension=pe:LAST_14_DAYS&dimension=ou:KitSalud001&dimension=AtrNombre01&desc=eventdate` | Las consultas de las últimas dos semanas |
 | `ana.rojas` registra una consulta hoy, `POST /api/jobConfigurations/TrabAnalit1/execute` y `GET /api/analytics?dimension=dx:PiAtenTot01&filter=pe:TODAY&filter=ou:KitSalud001` | Sube en 1 |
-| En `https://pacientes.salud.movil`, como `ana.rojas`, la app Dashboard | **Brigada de salud** con sus 9 elementos y datos |
+| En `https://pacientes.salud.movil`, como `ana.rojas`, la app Dashboard | **Brigada de salud** con sus 8 elementos y datos |
 | Desde la Interna, `curl -4` y `curl -6 --cacert <raíz> https://pacientes.salud.movil/` | `302` hacia `https://pacientes.salud.movil/dhis-web-login/` |
 | Como `ana.rojas`, `POST /api/tracker?async=false` con un paciente y `GET /api/tracker/trackedEntities?...&filter=AtrDocumen1:eq:<documento>` (P6) | `status OK` y el paciente con `createdBy` `ana.rojas` |
 | `cd /srv/dhis2 && sudo docker compose down && sudo docker compose up -d` y otra vez el conteo | El mismo número de pacientes |
@@ -157,7 +155,6 @@ kill %1
 - **El rol falla al cambiar la clave de fábrica de `admin` con `401` justo después de reiniciar `db`.** DHIS2 todavía no había recuperado sus conexiones. El rol ya espera a `/api/me`; si pasa igual, se vuelve a ejecutar el playbook.
 - **Un indicador de consultas sale vacío y el log de `core` dice `bad SQL grammar [... where and ...]`.** Al indicador le faltan los `analyticsPeriodBoundaries`, que la interfaz agrega sola y la API no. Están en `brigada.json`.
 - **El dashboard dice que el usuario no puede ver la analítica de eventos (`User is not allowed to view event analytics data`).** Al rol le falta `F_VIEW_EVENT_ANALYTICS`.
-- **La lista de consultas del dashboard dice `There was a problem loading this dashboard item`.** El usuario no tiene la app Line Listing, así que el dashboard no encuentra su plugin. En 2.42 la autoridad es `M_dhis-web-line-listing`; `GET /api/apps` con la cuenta debe incluir `line-listing`.
 - **`ana.rojas` o `carlos.perez` no pueden leer datos del programa (`not allowed to read data for Program`).** No están en el grupo "Personal clínico". Una importación de `kit.json` vacía el grupo; se vuelve a ejecutar el playbook.
 - **El trabajo de las tablas analíticas termina en milisegundos y el log dice `job parameters not aligned with existing outlier data`.** `skipOutliers` del trabajo no coincide con el de la última generación. El rol lo deja en `true`, que coincide con `POST /api/resourceTables/analytics` sin parámetros.
 - **Una cifra dice `A end date was not specified in periods, dimensions, filters`.** La visualización no tiene un periodo válido. En `relativePeriods` "hoy" se llama `thisDay` (en la API de analítica es `TODAY`).

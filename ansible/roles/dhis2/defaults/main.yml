@@ -16,6 +16,8 @@ dhis2_api: http://127.0.0.1:8080/api
 dhis2_ou: KitSalud001
 dhis2_grupo: GrpPersCli1
 dhis2_programa: ProgAtenPr1
+# Indicador de metadatos/brigada.json que marca si ya se importó (apps#12)
+dhis2_indicador_brigada: PiAtenTot01
 # Clave de fábrica de admin, solo para cambiarla en el primer arranque
 dhis2_admin_fabrica: district
 

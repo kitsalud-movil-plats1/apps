@@ -179,6 +179,41 @@
   changed_when: true
   failed_when: dhis2_demostracion.json.status | default('') != 'OK'
 
+# Indicadores y dashboard de la brigada (apps#12)
+- name: Metadatos de la brigada en la VM
+  ansible.builtin.copy:
+    src: "{{ dhis2_fuente }}/metadatos/brigada.json"
+    dest: "{{ dhis2_dir }}/brigada.json"
+    owner: root
+    group: root
+    mode: "0644"
+  register: dhis2_brigada_json
+
+- name: Indicadores de la brigada presentes
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/programIndicators/{{ dhis2_indicador_brigada }}?fields=id"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: dhis2_brigada_hoy
+  no_log: true
+
+- name: Importar los metadatos de la brigada
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/metadata?importStrategy=CREATE_AND_UPDATE&atomicMode=ALL&importReportMode=ERRORS"
+    method: POST
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ lookup('ansible.builtin.file', dhis2_fuente ~ '/metadatos/brigada.json') | from_json }}"
+    timeout: 300
+  register: dhis2_brigada_import
+  when: dhis2_brigada_json is changed or dhis2_brigada_hoy.status == 404
+  changed_when: true
+  failed_when: dhis2_brigada_import.json.status | default('') != 'OK'
+
 - name: SQL de la base de prerregistro en la VM
   ansible.builtin.copy:
     src: "{{ dhis2_fuente }}/prerregistro.sql"

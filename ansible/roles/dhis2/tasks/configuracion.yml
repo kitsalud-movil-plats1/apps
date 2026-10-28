@@ -238,6 +238,45 @@
   changed_when: true
   failed_when: dhis2_brigada_import.json.status | default('') != 'OK'
 
+# Tablas analíticas (apps#12, R-03). El trabajo continuo recalcula el periodo
+# más reciente cada dhis2_analitica_cada segundos, y todo a la hora indicada.
+# Sin datos agregados no hacen falta los valores atípicos; además, si no
+# coinciden con los de la última generación, el trabajo no hace nada
+# DHIS2 devuelve jobParameters completo; se comparan solo los que fija el rol
+- name: Trabajo de las tablas analíticas hoy
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/jobConfigurations/{{ dhis2_analitica_trabajo }}?fields=id,delay,jobParameters"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: dhis2_analitica_hoy
+  no_log: true
+
+- name: Trabajo de las tablas analíticas
+  ansible.builtin.uri:
+    url: "{{ dhis2_api }}/jobConfigurations{{ '' if dhis2_analitica_hoy.status == 404 else '/' ~ dhis2_analitica_trabajo }}"
+    method: "{{ 'POST' if dhis2_analitica_hoy.status == 404 else 'PUT' }}"
+    url_username: admin
+    url_password: "{{ dhis2_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body:
+      id: "{{ dhis2_analitica_trabajo }}"
+      name: Tablas analíticas de la brigada
+      jobType: CONTINUOUS_ANALYTICS_TABLE
+      schedulingType: FIXED_DELAY
+      delay: "{{ dhis2_analitica_cada }}"
+      jobParameters: "{{ dhis2_analitica_parametros }}"
+    status_code: [200, 201]
+  when: >-
+    dhis2_analitica_hoy.status == 404 or
+    dhis2_analitica_hoy.json.delay != dhis2_analitica_cada or
+    (dhis2_analitica_hoy.json.jobParameters | dict2items
+     | selectattr('key', 'in', dhis2_analitica_parametros) | items2dict) != dhis2_analitica_parametros
+  changed_when: true
+  no_log: true
+
 - name: SQL de la base de prerregistro en la VM
   ansible.builtin.copy:
     src: "{{ dhis2_fuente }}/prerregistro.sql"

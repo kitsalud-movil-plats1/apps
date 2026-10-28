@@ -1,8 +1,16 @@
 ---
 # Jellyfin en comunidad01 (R7, D-08, apps#5)
 jellyfin_dir: /srv/jellyfin
-# Bibliotecas, una carpeta por cada una (salud y comunidad)
+# Bibliotecas, una carpeta por cada una (salud y comunidad), y originales que
+# se preparan (fuera de las bibliotecas)
 jellyfin_medios_dir: /srv/medios/videos
+jellyfin_originales_dir: /srv/medios/originales
+# Wikimedia rechaza descargas sin un agente que identifique al cliente
+jellyfin_agente: kitsalud-movil/1.0 (proyecto académico Plataformas I)
+# H.264 Main y AAC estéreo en MP4, como mucho 480p de alto y unos 1 Mb/s (10.1)
+jellyfin_preparar_opciones: >-
+  -vf 'scale=-2:min(480\,ih)' -c:v libx264 -profile:v main -level 3.1 -preset medium -crf 23
+  -maxrate 1M -bufsize 2M -pix_fmt yuv420p -c:a aac -b:a 96k -ac 2 -movflags +faststart
 # Archivos del repositorio apps que se copian tal cual
 jellyfin_fuente: "{{ role_path }}/../../../comunidad01/jellyfin"
 # Usuario con el que corre el contenedor (compose.yml); es dueño de config y cache

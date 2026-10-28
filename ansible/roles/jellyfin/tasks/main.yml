@@ -1,27 +1,4 @@
 ---
-- name: Carpetas de las bibliotecas
-  ansible.builtin.file:
-    path: "{{ jellyfin_medios_dir }}/{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  loop: ["", salud, comunidad]
-
-# Solo se descargan si faltan o no coinciden con el sha256 (F-17, solo IPv4)
-- name: Audio y video de las bibliotecas
-  ansible.builtin.get_url:
-    url: "{{ contenido_medios_origen }}/{{ item.origen }}"
-    dest: "{{ jellyfin_medios_dir }}/{{ item.biblioteca }}/{{ item.archivo }}"
-    checksum: "sha256:{{ item.sha256 }}"
-    owner: root
-    group: root
-    mode: "0644"
-    timeout: 120
-  loop: "{{ contenido_medios }}"
-  loop_control:
-    label: "{{ item.biblioteca }}/{{ item.archivo }}"
-
 - name: Directorio del Compose
   ansible.builtin.file:
     path: "{{ jellyfin_dir }}"
@@ -43,6 +20,100 @@
   ansible.builtin.copy:
     src: "{{ jellyfin_fuente }}/compose.yml"
     dest: "{{ jellyfin_dir }}/compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Carpetas de las bibliotecas y de los originales
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ jellyfin_medios_dir }}"
+    - "{{ jellyfin_medios_dir }}/salud"
+    - "{{ jellyfin_medios_dir }}/comunidad"
+    - "{{ jellyfin_originales_dir }}"
+
+# Solo se descargan si faltan o no coinciden con el sha256 (F-17, solo IPv4).
+# Lo que ya viene listo va directo a su biblioteca
+- name: Audio y video listos para Jellyfin
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ jellyfin_medios_dir }}/{{ item.biblioteca }}/{{ item.archivo }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    http_agent: "{{ jellyfin_agente }}"
+    owner: root
+    group: root
+    mode: "0644"
+    timeout: 120
+  loop: "{{ contenido_medios | rejectattr('preparar', 'defined') | list + contenido_medios | selectattr('preparar', 'defined') | rejectattr('preparar') | list }}"
+  loop_control:
+    label: "{{ item.biblioteca }}/{{ item.archivo }}"
+
+# Los originales quedan fuera de las bibliotecas, nombrados por su sha256
+- name: Originales para preparar
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ jellyfin_originales_dir }}/{{ item.sha256[:16] }}{{ (item.url | urlsplit('path') | splitext)[1] }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    http_agent: "{{ jellyfin_agente }}"
+    owner: root
+    group: root
+    mode: "0644"
+    timeout: 300
+  loop: "{{ contenido_medios | selectattr('preparar', 'defined') | selectattr('preparar') | list }}"
+  loop_control:
+    label: "{{ item.archivo }}"
+
+# Una sola vez por archivo, con el ffmpeg de la imagen de Jellyfin. Se escribe
+# con otro nombre y se renombra al final, para que Jellyfin no vea uno a medias
+- name: Preparar a H.264/AAC de 480p
+  ansible.builtin.shell: >-
+    docker compose run --rm --no-deps --user 0:0 --entrypoint /usr/lib/jellyfin-ffmpeg/ffmpeg
+    -v {{ jellyfin_originales_dir }}:/originales:ro -v {{ jellyfin_medios_dir }}/{{ item.biblioteca }}:/salida
+    jellyfin -nostdin -v error -y -i "/originales/{{ item.sha256[:16] }}{{ (item.url | urlsplit('path') | splitext)[1] }}"
+    {{ jellyfin_preparar_opciones }} "/salida/.preparando.mp4"
+    && mv "{{ jellyfin_medios_dir }}/{{ item.biblioteca }}/.preparando.mp4" "{{ jellyfin_medios_dir }}/{{ item.biblioteca }}/{{ item.archivo }}"
+  args:
+    chdir: "{{ jellyfin_dir }}"
+    creates: "{{ jellyfin_medios_dir }}/{{ item.biblioteca }}/{{ item.archivo }}"
+  loop: "{{ contenido_medios | selectattr('preparar', 'defined') | selectattr('preparar') | list }}"
+  loop_control:
+    label: "{{ item.archivo }}"
+
+# El rol solo quita lo que puso él: lleva un registro de sus archivos y borra
+# los que salieron de la lista. Lo que llegue por el recurso contenido
+# (platform#10) no se toca. Sin registro, todo lo de las bibliotecas es del rol
+- name: Registro de los archivos del rol
+  ansible.builtin.slurp:
+    src: "{{ jellyfin_dir }}/medios-del-rol.txt"
+  register: jellyfin_registro
+  failed_when: false
+
+- name: Archivos de las bibliotecas
+  ansible.builtin.find:
+    paths: ["{{ jellyfin_medios_dir }}/salud", "{{ jellyfin_medios_dir }}/comunidad"]
+  register: jellyfin_medios_hoy
+  when: jellyfin_registro.content is not defined
+
+- name: Quitar los archivos del rol que ya no están en la lista
+  ansible.builtin.file:
+    path: "{{ jellyfin_medios_dir }}/{{ item }}"
+    state: absent
+  loop: "{{ jellyfin_anteriores | difference(jellyfin_actuales) }}"
+  vars:
+    jellyfin_anteriores: >-
+      {{ (jellyfin_registro.content | b64decode).splitlines() if jellyfin_registro.content is defined
+         else jellyfin_medios_hoy.files | map(attribute='path') | map('relpath', jellyfin_medios_dir) | list }}
+    jellyfin_actuales: "{{ contenido_medios | map(attribute='biblioteca') | zip(contenido_medios | map(attribute='archivo')) | map('join', '/') | list }}"
+
+- name: Registro de los archivos del rol al día
+  ansible.builtin.copy:
+    content: "{{ contenido_medios | map(attribute='biblioteca') | zip(contenido_medios | map(attribute='archivo')) | map('join', '/') | join('\n') }}\n"
+    dest: "{{ jellyfin_dir }}/medios-del-rol.txt"
     owner: root
     group: root
     mode: "0644"

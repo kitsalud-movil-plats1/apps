@@ -1,6 +1,6 @@
 # Jellyfin en comunidad01
 
-Audio y video para la sala de espera (R7, D-08, sección 10.5). Hay dos bibliotecas: **Salud**, con contenido médico general, y **Comunidad**, con material educativo y para niños. La comunidad entra sin contraseña con el usuario `comunidad`. Todo se reproduce directo, sin transcodificar, y la administración solo se puede hacer desde la Interna y por NetBird. Caddy lo publica en `http://videos.salud.movil` ([`../caddy/`](../caddy/)).
+Audio y video para la sala de espera (R7, D-08, sección 10.5). Hay dos bibliotecas: **Salud**, con contenido médico general, y **Comunidad**, con material educativo y para niños. La comunidad entra con el usuario `comunidad` y la contraseña vacía. Todo se reproduce directo, sin transcodificar, y la administración solo se puede hacer desde la Interna y por NetBird. Caddy lo publica en `http://videos.salud.movil` ([`../caddy/`](../caddy/)).
 
 | Archivo | Qué es |
 |---|---|
@@ -30,7 +30,9 @@ Las bibliotecas no buscan metadatos ni imágenes en Internet (C-03) y no extraen
 | Cuenta | Contraseña | Política |
 |---|---|---|
 | `admin` | En el vault (`vault_jellyfin_admin_password`), según la convención del grupo (R-14) | Administrador, oculta en la pantalla de entrada y sin acceso remoto, así que solo entra desde las redes locales |
-| `comunidad` | Ninguna | Visible en la pantalla de entrada. Solo reproduce: sin transcodificación de video ni de audio, sin remux, sin descargas, sin borrar y sin cambiar preferencias |
+| `comunidad` | Vacía | Visible en la pantalla de entrada: se toca «comunidad» y después «Iniciar sesión», sin escribir nada. Solo reproduce: sin transcodificación de video ni de audio, sin remux, sin descargas, sin borrar y sin cambiar preferencias |
+
+La pantalla de entrada no tiene Quick Connect ni «Contraseña olvidada», que no sirven en el kit (Quick Connect está apagado en el servidor y el botón se oculta con el CSS de la marca), y muestra el aviso «Toque «comunidad» y después «Iniciar sesión», sin escribir contraseña».
 
 Desde la Comunidad, `admin` recibe `403` y el log de Jellyfin dice `remote access disabled and user not in local network`. Así queda cerrada toda la administración, interfaz y API, sin reglas de rutas en Caddy.
 
@@ -55,7 +57,7 @@ Desde `platform/ansible/`, con `ansible-playbook playbooks/comunidad01.yml`. El 
 1. Crea `/srv/medios/videos/{salud,comunidad}` y descarga el material.
 2. Copia `compose.yml` a `/srv/jellyfin/`, levanta el contenedor y espera a que `/health` responda `Healthy`.
 3. Si el asistente inicial no se ha hecho, lo completa (español, Colombia y la cuenta `admin`).
-4. Entra como `admin` y aplica la red, las bibliotecas que falten, la cuenta `comunidad` y las políticas. La red y las políticas solo se guardan si difieren de las del rol. Si cambia la red, reinicia el contenedor al final.
+4. Entra como `admin` y aplica la red, Quick Connect apagado, el aviso y el CSS de la pantalla de entrada, las bibliotecas que falten, la cuenta `comunidad` y las políticas. Cada ajuste solo se guarda si difiere del rol. Si cambia la red, reinicia el contenedor al final.
 
 La imagen se descarga por F-17 (en base).
 
@@ -79,6 +81,7 @@ Por el túnel la conexión llega desde kit01, que es red local, así que `admin`
 | Desde sw01, `/tool fetch url="http://10.20.20.12/health" http-header-field="Host: videos.salud.movil" output=user` y con `[fd5a:fc7e:d716:20::12]` | `Healthy` |
 | `POST /Users/AuthenticateByName` de `admin` a `127.0.0.1:8096` con `X-Forwarded-For` de la Interna y de la Comunidad, en las dos familias | `200` y `403` |
 | El mismo login de `comunidad` con `Pw` vacío | `200` desde las dos redes |
+| En el navegador, tocar «comunidad» y «Iniciar sesión» sin contraseña | La página de inicio con las bibliotecas Salud y Comunidad |
 | El login de `admin` por Caddy con un `X-Forwarded-For` falso de la Interna | `403` (Jellyfin ve la IP real) |
 | `POST /Items/<id>/PlaybackInfo` como `comunidad` con el perfil de un navegador móvil | `SupportsDirectPlay: true` y sin `TranscodingUrl` |
 | 5 descargas de `/Videos/<id>/stream?static=true` a 1 Mb/s durante 60 s, con `docker stats` y `pgrep ffmpeg` | Jellyfin con 0,3 % de CPU de media (pico 1,8 %), unos 190 MB y ningún `ffmpeg` |
@@ -87,6 +90,7 @@ Por el túnel la conexión llega desde kit01, que es red local, así que `admin`
 ## Diagnóstico
 
 - **`admin` no puede entrar.** Si entra desde la Comunidad, es lo esperado. Si entra desde la Interna, revisar en el log (`sudo docker logs jellyfin-jellyfin-1`) con qué IP llegó. Si es `127.0.0.1`, Caddy no está mandando `X-Forwarded-For` o falta `127.0.0.1` en los proxies de confianza.
+- **La pantalla pide la contraseña de `comunidad`.** Es lo esperado. En Jellyfin 12 una contraseña vacía cuenta como configurada (`HasPassword: true`), así que la pantalla muestra el formulario. Se deja vacía y se toca «Iniciar sesión».
 - **Un video no se reproduce.** No está en H.264/AAC, o el navegador no lo reproduce directo. `ffprobe` (está en la imagen, en `/usr/lib/jellyfin-ffmpeg/ffprobe`) muestra los códecs.
 - **Una reproducción falla con `500` y el log dice `The process cannot access the file '/cache/transcodes/.jellyfin-transcode'`.** Jellyfin crea ese marcador con el primer pedido y varios a la vez chocan. Pasa una sola vez, porque el marcador queda en `/srv/jellyfin/cache`; se vuelve a intentar.
 - **La biblioteca no muestra un archivo nuevo.** Jellyfin vigila las carpetas, pero se puede forzar con "Escanear todas las bibliotecas" en el panel o `POST /Library/Refresh`.

@@ -49,7 +49,7 @@ jellyfin_politica_admin:
   IsAdministrator: true
   IsHidden: true
   EnableRemoteAccess: false
-# comunidad entra sin contraseña, solo reproduce y nunca transcodifica (10.1)
+# comunidad entra con la contraseña vacía, solo reproduce y nunca transcodifica (10.1)
 jellyfin_politica_comunidad:
   IsAdministrator: false
   IsHidden: false
@@ -73,3 +73,14 @@ jellyfin_politica_comunidad:
   EnableLiveTvManagement: false
   EnableRemoteControlOfOtherUsers: false
   EnableSharedDeviceControl: false
+  SyncPlayAccess: None
+
+
+# Pantalla de entrada: sin Quick Connect ni "Olvidé mi contraseña", que no
+# sirven en el kit, y un aviso de cómo entrar
+jellyfin_servidor:
+  QuickConnectAvailable: false
+jellyfin_marca:
+  LoginDisclaimer: Toque «comunidad» y después «Iniciar sesión», sin escribir contraseña.
+  CustomCss: ".btnForgotPassword { display: none !important; }"
+  SplashscreenEnabled: false

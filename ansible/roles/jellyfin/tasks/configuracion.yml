@@ -83,6 +83,44 @@
   no_log: true
   notify: Reiniciar jellyfin
 
+- name: Servidor hoy
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_servidor_hoy
+  no_log: true
+
+- name: Servidor sin Quick Connect
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: "{{ jellyfin_servidor_hoy.json | combine(jellyfin_servidor) }}"
+    status_code: [200, 204]
+  when: (jellyfin_servidor_hoy.json | dict2items | selectattr('key', 'in', jellyfin_servidor) | items2dict) != jellyfin_servidor
+  changed_when: true
+  no_log: true
+
+- name: Pantalla de entrada hoy
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration/branding"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_marca_hoy
+  no_log: true
+
+- name: Pantalla de entrada
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration/Branding"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: "{{ jellyfin_marca_hoy.json | combine(jellyfin_marca) }}"
+    status_code: [200, 204]
+  when: (jellyfin_marca_hoy.json | dict2items | selectattr('key', 'in', jellyfin_marca) | items2dict) != jellyfin_marca
+  changed_when: true
+  no_log: true
+
 - name: Bibliotecas hoy
   ansible.builtin.uri:
     url: "{{ jellyfin_api }}/Library/VirtualFolders"
@@ -110,7 +148,7 @@
   register: jellyfin_usuarios_hoy
   no_log: true
 
-- name: Usuario comunidad, sin contraseña
+- name: Usuario comunidad, con la contraseña vacía
   ansible.builtin.uri:
     url: "{{ jellyfin_api }}/Users/New"
     method: POST

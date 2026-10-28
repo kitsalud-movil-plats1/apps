@@ -1,0 +1,183 @@
+---
+# Configuración por la API local (127.0.0.1:8096). Cada paso solo actúa si
+# hace falta, así que una segunda ejecución termina con changed=0.
+- name: Estado del asistente inicial
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Info/Public"
+  register: jellyfin_info
+
+- name: Asistente inicial (idioma, país y cuenta admin)
+  when: not jellyfin_info.json.StartupWizardCompleted
+  no_log: true
+  block:
+    - name: Idioma y país
+      ansible.builtin.uri:
+        url: "{{ jellyfin_api }}/Startup/Configuration"
+        method: POST
+        body_format: json
+        body: { ServerName: "{{ inventory_hostname }}", UICulture: es, MetadataCountryCode: CO, PreferredMetadataLanguage: es }
+        status_code: [200, 204]
+
+    # Jellyfin crea el primer usuario al consultarlo
+    - name: Primer usuario
+      ansible.builtin.uri:
+        url: "{{ jellyfin_api }}/Startup/User"
+
+    - name: Cuenta admin
+      ansible.builtin.uri:
+        url: "{{ jellyfin_api }}/Startup/User"
+        method: POST
+        body_format: json
+        body: { Name: admin, Password: "{{ jellyfin_admin_password }}" }
+        status_code: [200, 204]
+
+    - name: Acceso remoto (la Comunidad es remota para Jellyfin)
+      ansible.builtin.uri:
+        url: "{{ jellyfin_api }}/Startup/RemoteAccess"
+        method: POST
+        body_format: json
+        body: { EnableRemoteAccess: true }
+        status_code: [200, 204]
+
+    - name: Terminar el asistente
+      ansible.builtin.uri:
+        url: "{{ jellyfin_api }}/Startup/Complete"
+        method: POST
+        status_code: [200, 204]
+      changed_when: true
+
+- name: Sesión de admin
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/Users/AuthenticateByName"
+    method: POST
+    headers: { Authorization: "{{ jellyfin_cliente }}" }
+    body_format: json
+    body: { Username: admin, Pw: "{{ jellyfin_admin_password }}" }
+  register: jellyfin_sesion
+  no_log: true
+
+- name: Cabecera con el token
+  ansible.builtin.set_fact:
+    jellyfin_auth: { Authorization: '{{ jellyfin_cliente }}, Token="{{ jellyfin_sesion.json.AccessToken }}"' }
+  no_log: true
+
+- name: Red de Jellyfin hoy
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration/network"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_red_hoy
+  no_log: true
+
+# Se guarda lo de hoy con los valores del rol encima. Cambiar la dirección de
+# escucha exige reiniciar
+- name: Red de Jellyfin
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration/network"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: "{{ jellyfin_red_hoy.json | combine(jellyfin_red) }}"
+    status_code: [200, 204]
+  when: (jellyfin_red_hoy.json | dict2items | selectattr('key', 'in', jellyfin_red) | items2dict) != jellyfin_red
+  changed_when: true
+  no_log: true
+  notify: Reiniciar jellyfin
+
+- name: Servidor hoy
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_servidor_hoy
+  no_log: true
+
+- name: Servidor sin Quick Connect
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: "{{ jellyfin_servidor_hoy.json | combine(jellyfin_servidor) }}"
+    status_code: [200, 204]
+  when: (jellyfin_servidor_hoy.json | dict2items | selectattr('key', 'in', jellyfin_servidor) | items2dict) != jellyfin_servidor
+  changed_when: true
+  no_log: true
+
+- name: Pantalla de entrada hoy
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration/branding"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_marca_hoy
+  no_log: true
+
+- name: Pantalla de entrada
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/System/Configuration/Branding"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: "{{ jellyfin_marca_hoy.json | combine(jellyfin_marca) }}"
+    status_code: [200, 204]
+  when: (jellyfin_marca_hoy.json | dict2items | selectattr('key', 'in', jellyfin_marca) | items2dict) != jellyfin_marca
+  changed_when: true
+  no_log: true
+
+- name: Bibliotecas hoy
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/Library/VirtualFolders"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_bibliotecas_hoy
+  no_log: true
+
+- name: Bibliotecas
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/Library/VirtualFolders?name={{ item.nombre | urlencode }}&collectionType=mixed&paths={{ ('/media/' ~ item.carpeta) | urlencode }}&refreshLibrary=true"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: { LibraryOptions: "{{ jellyfin_biblioteca_opciones }}" }
+    status_code: [200, 204]
+  loop: "{{ jellyfin_bibliotecas | rejectattr('nombre', 'in', jellyfin_bibliotecas_hoy.json | map(attribute='Name') | list) | list }}"
+  loop_control:
+    label: "{{ item.nombre }}"
+  changed_when: true
+
+- name: Usuarios hoy
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/Users"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_usuarios_hoy
+  no_log: true
+
+- name: Usuario comunidad, con la contraseña vacía
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/Users/New"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: { Name: comunidad, Password: "" }
+  when: "'comunidad' not in jellyfin_usuarios_hoy.json | map(attribute='Name')"
+  register: jellyfin_comunidad_nuevo
+  changed_when: true
+
+- name: Usuarios con su política
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/Users"
+    headers: "{{ jellyfin_auth }}"
+  register: jellyfin_usuarios
+  no_log: true
+
+- name: Políticas de admin y comunidad
+  ansible.builtin.uri:
+    url: "{{ jellyfin_api }}/Users/{{ item.0.Id }}/Policy"
+    method: POST
+    headers: "{{ jellyfin_auth }}"
+    body_format: json
+    body: "{{ item.0.Policy | combine(item.1) }}"
+    status_code: [200, 204]
+  loop: >-
+    {{ [(jellyfin_usuarios.json | selectattr('Name', 'eq', 'admin') | first, jellyfin_politica_admin),
+        (jellyfin_usuarios.json | selectattr('Name', 'eq', 'comunidad') | first, jellyfin_politica_comunidad)] }}
+  loop_control:
+    label: "{{ item.0.Name }}"
+  when: (item.0.Policy | dict2items | selectattr('key', 'in', item.1) | items2dict) != item.1
+  changed_when: true

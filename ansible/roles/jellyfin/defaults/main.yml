@@ -1,0 +1,94 @@
+---
+# Jellyfin en comunidad01 (R7, D-08, apps#5)
+jellyfin_dir: /srv/jellyfin
+# Bibliotecas, una carpeta por cada una (salud y comunidad), y originales que
+# se preparan (fuera de las bibliotecas)
+jellyfin_medios_dir: /srv/medios/videos
+jellyfin_originales_dir: /srv/medios/originales
+# Wikimedia rechaza descargas sin un agente que identifique al cliente
+jellyfin_agente: kitsalud-movil/1.0 (proyecto académico Plataformas I)
+# H.264 Main y AAC estéreo en MP4, como mucho 480p de alto y unos 1 Mb/s (10.1)
+jellyfin_preparar_opciones: >-
+  -vf 'scale=-2:min(480\,ih)' -c:v libx264 -profile:v main -level 3.1 -preset medium -crf 23
+  -maxrate 1M -bufsize 2M -pix_fmt yuv420p -c:a aac -b:a 96k -ac 2 -movflags +faststart
+# Archivos del repositorio apps que se copian tal cual
+jellyfin_fuente: "{{ role_path }}/../../../comunidad01/jellyfin"
+# Usuario con el que corre el contenedor (compose.yml); es dueño de config y cache
+jellyfin_uid: 10020
+# API local de Jellyfin (la configuración se hace desde la VM, sin pasar por Caddy)
+jellyfin_api: http://127.0.0.1:8096
+
+# Cabecera de cliente que pide la API de Jellyfin; el token se agrega después
+jellyfin_cliente: 'MediaBrowser Client="Ansible", Device="comunidad01", DeviceId="ansible-comunidad01", Version="1"'
+
+# Red (decisiones de apps#5). Escucha solo en 127.0.0.1, confía en Caddy y
+# trata como locales jellyfin_redes_locales (inventario); sin descubrimiento
+# ni UPnP. EnableRemoteAccess deja entrar a la Comunidad, que es remota
+jellyfin_red:
+  LocalNetworkAddresses: ["127.0.0.1"]
+  KnownProxies: ["127.0.0.1"]
+  LocalNetworkSubnets: "{{ jellyfin_redes_locales }}"
+  AutoDiscovery: false
+  EnableUPnP: false
+  EnableRemoteAccess: true
+  EnableIPv4: true
+  EnableIPv6: true
+
+# Bibliotecas, de tipo mixed (audio y video), sin metadatos ni imágenes de
+# Internet (C-03), sin capítulos ni miniaturas, que cargarían la CPU
+jellyfin_bibliotecas:
+  - { nombre: Salud, carpeta: salud }
+  - { nombre: Comunidad, carpeta: comunidad }
+jellyfin_biblioteca_opciones:
+  Enabled: true
+  EnableRealtimeMonitor: true
+  EnableInternetProviders: false
+  EnableChapterImageExtraction: false
+  ExtractChapterImagesDuringLibraryScan: false
+  EnableTrickplayImageExtraction: false
+  ExtractTrickplayImagesDuringLibraryScan: false
+  EnableLUFSScan: false
+  SaveLocalMetadata: false
+  AutomaticRefreshIntervalDays: 0
+  TypeOptions: []
+
+# Políticas que fija el rol; lo demás queda como lo deja Jellyfin
+jellyfin_politica_admin:
+  IsAdministrator: true
+  IsHidden: true
+  EnableRemoteAccess: false
+# comunidad entra con la contraseña vacía, solo reproduce y nunca transcodifica (10.1)
+jellyfin_politica_comunidad:
+  IsAdministrator: false
+  IsHidden: false
+  IsDisabled: false
+  EnableRemoteAccess: true
+  EnableMediaPlayback: true
+  EnableAllFolders: true
+  EnableVideoPlaybackTranscoding: false
+  EnableAudioPlaybackTranscoding: false
+  EnablePlaybackRemuxing: false
+  EnableMediaConversion: false
+  EnableSyncTranscoding: false
+  EnableContentDeletion: false
+  EnableContentDownloading: false
+  EnablePublicSharing: false
+  EnableUserPreferenceAccess: false
+  EnableCollectionManagement: false
+  EnableSubtitleManagement: false
+  EnableLyricManagement: false
+  EnableLiveTvAccess: false
+  EnableLiveTvManagement: false
+  EnableRemoteControlOfOtherUsers: false
+  EnableSharedDeviceControl: false
+  SyncPlayAccess: None
+
+
+# Pantalla de entrada: sin Quick Connect ni "Olvidé mi contraseña", que no
+# sirven en el kit, y un aviso de cómo entrar
+jellyfin_servidor:
+  QuickConnectAvailable: false
+jellyfin_marca:
+  LoginDisclaimer: Toque «comunidad» y después «Iniciar sesión», sin escribir contraseña.
+  CustomCss: ".btnForgotPassword { display: none !important; }"
+  SplashscreenEnabled: false

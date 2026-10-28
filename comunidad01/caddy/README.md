@@ -11,6 +11,7 @@ Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por no
 | Nombre | Destino | Protocolo |
 |---|---|---|
 | `biblioteca.salud.movil` | Kiwix en `127.0.0.1:8090` | HTTP |
+| `videos.salud.movil` | Jellyfin en `127.0.0.1:8096` ([`../jellyfin/`](../jellyfin/)) | HTTP. Jellyfin toma la IP del cliente de `X-Forwarded-For`, que Caddy reemplaza siempre |
 | `registro.salud.movil` | Formularios en `127.0.0.1:8100` ([`../formularios/`](../formularios/)) | HTTPS (`tls internal`), con `default_sni registro.salud.movil` |
 | `ca.salud.movil` | `/srv/publica` (página y `raiz.crt` con `Content-Type: application/x-x509-ca-cert`) | HTTP |
 

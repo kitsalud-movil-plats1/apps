@@ -558,5 +558,581 @@
    ],
    "filter": "#{EtapaConsu1.DeMotivoPr1} == 'OTRO'"
   }
+ ],
+ "visualizations": [
+  {
+   "id": "VisAtenSem1",
+   "name": "Atenciones esta semana",
+   "type": "SINGLE_VALUE",
+   "description": "Consultas registradas desde el lunes",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiAtenTot01"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "thisWeek": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "dx"
+   ],
+   "rowDimensions": [],
+   "filterDimensions": [
+    "pe",
+    "ou"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  },
+  {
+   "id": "VisFiebSem1",
+   "name": "Consultas con fiebre esta semana",
+   "type": "SINGLE_VALUE",
+   "description": "Consultas de esta semana con temperatura de 38 °C o más",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiFiebre001"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "thisWeek": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "dx"
+   ],
+   "rowDimensions": [],
+   "filterDimensions": [
+    "pe",
+    "ou"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  },
+  {
+   "id": "VisAtenDia1",
+   "name": "Atenciones por día",
+   "type": "COLUMN",
+   "description": "Consultas de cada día en las últimas dos semanas, con hoy",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiAtenTot01"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "last14Days": true,
+    "today": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "dx"
+   ],
+   "rowDimensions": [
+    "pe"
+   ],
+   "filterDimensions": [
+    "ou"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  },
+  {
+   "id": "VisAtenNue1",
+   "name": "Atenciones y pacientes nuevos por semana",
+   "type": "LINE",
+   "description": "Consultas y pacientes que llegaron por primera vez, por semana",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiAtenTot01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiPacNuev01"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "last12Weeks": true,
+    "thisWeek": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "dx"
+   ],
+   "rowDimensions": [
+    "pe"
+   ],
+   "filterDimensions": [
+    "ou"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  },
+  {
+   "id": "VisMotivos1",
+   "name": "Motivos de consulta",
+   "type": "BAR",
+   "description": "Motivo principal de las consultas de las últimas 12 semanas",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiMotCont01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiMotFieb01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiMotDolo01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiMotEmba01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiMotVacu01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiMotOtro01"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "last12Weeks": true,
+    "thisWeek": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "ou"
+   ],
+   "rowDimensions": [
+    "dx"
+   ],
+   "filterDimensions": [
+    "pe"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   },
+   "hideLegend": true
+  },
+  {
+   "id": "VisEdades01",
+   "name": "Atenciones por edad",
+   "type": "COLUMN",
+   "description": "Consultas de las últimas 12 semanas por edad a la fecha de la consulta",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiEdad00a04"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiEdad05a14"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiEdad15a49"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiEdad50ym1"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "last12Weeks": true,
+    "thisWeek": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "ou"
+   ],
+   "rowDimensions": [
+    "dx"
+   ],
+   "filterDimensions": [
+    "pe"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   },
+   "hideLegend": true
+  },
+  {
+   "id": "VisSexo0001",
+   "name": "Atenciones por sexo",
+   "type": "PIE",
+   "description": "Consultas de las últimas 12 semanas por sexo",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiSexoFem01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiSexoMas01"
+     }
+    },
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiSexoOtr01"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "last12Weeks": true,
+    "thisWeek": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "dx"
+   ],
+   "rowDimensions": [],
+   "filterDimensions": [
+    "pe",
+    "ou"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  }
+ ],
+ "eventVisualizations": [
+  {
+   "id": "LlConsult01",
+   "name": "Últimas consultas",
+   "type": "LINE_LIST",
+   "outputType": "EVENT",
+   "legacy": false,
+   "description": "Consultas de hoy y de las últimas dos semanas, de la más reciente a la más antigua",
+   "program": {
+    "id": "ProgAtenPr1"
+   },
+   "programStage": {
+    "id": "EtapaConsu1"
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "eventDate",
+    "AtrNombre01",
+    "AtrApellid1",
+    "EtapaConsu1.DeMotivoPr1",
+    "EtapaConsu1.DeMotivoCo1",
+    "EtapaConsu1.DeTempera01"
+   ],
+   "filterDimensions": [
+    "ou"
+   ],
+   "simpleDimensions": [
+    {
+     "parent": "COLUMN",
+     "dimension": "eventDate",
+     "values": [
+      "TODAY",
+      "LAST_14_DAYS"
+     ]
+    }
+   ],
+   "attributeDimensions": [
+    {
+     "attribute": {
+      "id": "AtrNombre01"
+     }
+    },
+    {
+     "attribute": {
+      "id": "AtrApellid1"
+     }
+    }
+   ],
+   "dataElementDimensions": [
+    {
+     "dataElement": {
+      "id": "DeMotivoPr1"
+     },
+     "programStage": {
+      "id": "EtapaConsu1"
+     }
+    },
+    {
+     "dataElement": {
+      "id": "DeMotivoCo1"
+     },
+     "programStage": {
+      "id": "EtapaConsu1"
+     }
+    },
+    {
+     "dataElement": {
+      "id": "DeTempera01"
+     },
+     "programStage": {
+      "id": "EtapaConsu1"
+     }
+    }
+   ],
+   "sorting": [
+    {
+     "dimension": "eventDate",
+     "direction": "DESC"
+    }
+   ],
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  }
+ ],
+ "dashboards": [
+  {
+   "id": "DashBrigad1",
+   "name": "Brigada de salud",
+   "description": "Cómo va la jornada de la brigada. Los datos se actualizan cada media hora.",
+   "dashboardItems": [
+    {
+     "id": "DiAtenSem01",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisAtenSem1"
+     },
+     "x": 0,
+     "y": 0,
+     "width": 20,
+     "height": 12
+    },
+    {
+     "id": "DiFiebSem01",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisFiebSem1"
+     },
+     "x": 20,
+     "y": 0,
+     "width": 20,
+     "height": 12
+    },
+    {
+     "id": "DiSexo00001",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisSexo0001"
+     },
+     "x": 40,
+     "y": 0,
+     "width": 20,
+     "height": 12
+    },
+    {
+     "id": "DiAtenDia01",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisAtenDia1"
+     },
+     "x": 0,
+     "y": 12,
+     "width": 30,
+     "height": 20
+    },
+    {
+     "id": "DiAtenNue01",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisAtenNue1"
+     },
+     "x": 30,
+     "y": 12,
+     "width": 30,
+     "height": 20
+    },
+    {
+     "id": "DiMotivos01",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisMotivos1"
+     },
+     "x": 0,
+     "y": 32,
+     "width": 30,
+     "height": 20
+    },
+    {
+     "id": "DiEdades001",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisEdades01"
+     },
+     "x": 30,
+     "y": 32,
+     "width": 30,
+     "height": 20
+    },
+    {
+     "id": "DiConsult01",
+     "type": "EVENT_VISUALIZATION",
+     "eventVisualization": {
+      "id": "LlConsult01"
+     },
+     "x": 0,
+     "y": 52,
+     "width": 60,
+     "height": 25
+    }
+   ],
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  }
  ]
 }

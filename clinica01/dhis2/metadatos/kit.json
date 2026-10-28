@@ -242,7 +242,7 @@
     "F_TRACKED_ENTITY_UPDATE",
     "F_VIEW_EVENT_ANALYTICS",
     "M_dhis-web-data-visualizer",
-    "M_line-listing"
+    "M_dhis-web-line-listing"
    ]
   },
   {

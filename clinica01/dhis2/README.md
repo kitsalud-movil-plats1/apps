@@ -73,16 +73,17 @@ El dashboard **Brigada de salud** muestra cómo va la jornada. Lo ve el grupo "P
 
 | Elemento | Tipo | Periodo |
 |---|---|---|
+| Atenciones hoy | Cifra | Hoy |
 | Atenciones esta semana | Cifra | Esta semana |
 | Consultas con fiebre esta semana | Cifra | Esta semana |
 | Atenciones por sexo | Torta | Últimas 12 semanas y la actual |
-| Atenciones por día | Columnas | Últimos 14 días y hoy |
-| Atenciones y pacientes nuevos por semana | Líneas | Últimas 12 semanas y la actual |
+| Atenciones por día | Columnas | Los 14 días anteriores a hoy |
+| Atenciones y pacientes nuevos por semana | Líneas | Las 12 semanas anteriores a esta |
 | Motivos de consulta | Barras | Últimas 12 semanas y la actual |
 | Atenciones por edad | Columnas | Últimas 12 semanas y la actual |
 | Últimas consultas | Lista (fecha, nombre, apellido, motivo principal, motivo y temperatura) | Últimos 14 días y hoy, de la más reciente a la más antigua |
 
-Los periodos relativos de DHIS2 no incluyen el periodo en curso (`LAST_12_WEEKS` no trae esta semana y `LAST_14_DAYS` no trae hoy), así que cada visualización suma `thisWeek` o `today`.
+Los periodos relativos de DHIS2 no incluyen el periodo en curso (`LAST_12_WEEKS` no trae esta semana y `LAST_14_DAYS` no trae hoy). Donde el periodo es filtro (sexo, motivos y edad) se suma `thisWeek`. En los gráficos por periodo, DHIS2 pondría el periodo en curso al principio del eje, así que esos muestran solo periodos completos, y hoy y esta semana van en las cifras de arriba.
 
 **Indicadores de programa.** Todos son de tipo `EVENT` y cuentan consultas (`V{event_count}`), salvo "Pacientes nuevos", que es `ENROLLMENT` y cuenta inscripciones. Cada uno lleva sus límites de periodo (`analyticsPeriodBoundaries`) por la fecha de la consulta o de la inscripción.
 
@@ -134,7 +135,7 @@ kill %1
 | Como `ana.rojas`, `GET /api/analytics?dimension=dx:PiAtenTot01;PiFiebre001;PiPacNuev01&filter=pe:2026&filter=ou:KitSalud001` y el mismo conteo por `/api/tracker/trackedEntities` | Las mismas cifras (los 16 indicadores coinciden) |
 | Como `ana.rojas`, `GET /api/analytics/events/query/ProgAtenPr1?stage=EtapaConsu1&dimension=pe:LAST_14_DAYS&dimension=ou:KitSalud001&dimension=AtrNombre01&desc=eventdate` | Las consultas de las últimas dos semanas |
 | `ana.rojas` registra una consulta hoy, `POST /api/jobConfigurations/TrabAnalit1/execute` y `GET /api/analytics?dimension=dx:PiAtenTot01&filter=pe:TODAY&filter=ou:KitSalud001` | Sube en 1 |
-| En `https://pacientes.salud.movil`, como `ana.rojas`, la app Dashboard | **Brigada de salud** con sus 8 elementos y datos |
+| En `https://pacientes.salud.movil`, como `ana.rojas`, la app Dashboard | **Brigada de salud** con sus 9 elementos y datos |
 | Desde la Interna, `curl -4` y `curl -6 --cacert <raíz> https://pacientes.salud.movil/` | `302` hacia `https://pacientes.salud.movil/dhis-web-login/` |
 | Como `ana.rojas`, `POST /api/tracker?async=false` con un paciente y `GET /api/tracker/trackedEntities?...&filter=AtrDocumen1:eq:<documento>` (P6) | `status OK` y el paciente con `createdBy` `ana.rojas` |
 | `cd /srv/dhis2 && sudo docker compose down && sudo docker compose up -d` y otra vez el conteo | El mismo número de pacientes |
@@ -159,6 +160,7 @@ kill %1
 - **La lista de consultas del dashboard dice `There was a problem loading this dashboard item`.** El usuario no tiene la app Line Listing, así que el dashboard no encuentra su plugin. En 2.42 la autoridad es `M_dhis-web-line-listing`; `GET /api/apps` con la cuenta debe incluir `line-listing`.
 - **`ana.rojas` o `carlos.perez` no pueden leer datos del programa (`not allowed to read data for Program`).** No están en el grupo "Personal clínico". Una importación de `kit.json` vacía el grupo; se vuelve a ejecutar el playbook.
 - **El trabajo de las tablas analíticas termina en milisegundos y el log dice `job parameters not aligned with existing outlier data`.** `skipOutliers` del trabajo no coincide con el de la última generación. El rol lo deja en `true`, que coincide con `POST /api/resourceTables/analytics` sin parámetros.
+- **Una cifra dice `A end date was not specified in periods, dimensions, filters`.** La visualización no tiene un periodo válido. En `relativePeriods` "hoy" se llama `thisDay` (en la API de analítica es `TODAY`).
 - **El dashboard no muestra lo de hoy.** El trabajo continuo corre cada 30 minutos (`GET /api/jobConfigurations/TrabAnalit1?fields=lastExecuted,lastExecutedStatus`). Para no esperar, se ejecuta a mano.
 - **`files` sin permisos.** `/srv/dhis2/files` tiene que ser del usuario `65534`.
 - **Después del login el navegador va a `http://` o pierde el puerto del túnel.** Falta el `RemoteIpValve` (`sudo docker exec dhis2-core-1 cat /usr/local/tomcat/conf/context.xml`) o Caddy no manda `X-Forwarded-Port`.

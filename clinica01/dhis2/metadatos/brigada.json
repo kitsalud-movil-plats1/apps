@@ -645,10 +645,10 @@
    }
   },
   {
-   "id": "VisAtenDia1",
-   "name": "Atenciones por día",
-   "type": "COLUMN",
-   "description": "Consultas de cada día en las últimas dos semanas, con hoy",
+   "id": "VisAtenHoy1",
+   "name": "Atenciones hoy",
+   "type": "SINGLE_VALUE",
+   "description": "Consultas registradas hoy",
    "dataDimensionItems": [
     {
      "dataDimensionItemType": "PROGRAM_INDICATOR",
@@ -658,8 +658,49 @@
     }
    ],
    "relativePeriods": {
-    "last14Days": true,
-    "today": true
+    "thisDay": true
+   },
+   "organisationUnits": [
+    {
+     "id": "KitSalud001"
+    }
+   ],
+   "columnDimensions": [
+    "dx"
+   ],
+   "rowDimensions": [],
+   "filterDimensions": [
+    "pe",
+    "ou"
+   ],
+   "hideEmptyRowItems": "NONE",
+   "showData": true,
+   "sharing": {
+    "public": "r-------",
+    "external": false,
+    "userGroups": {
+     "GrpPersCli1": {
+      "id": "GrpPersCli1",
+      "access": "r-------"
+     }
+    }
+   }
+  },
+  {
+   "id": "VisAtenDia1",
+   "name": "Atenciones por día",
+   "type": "COLUMN",
+   "description": "Consultas de cada día en las dos semanas anteriores a hoy",
+   "dataDimensionItems": [
+    {
+     "dataDimensionItemType": "PROGRAM_INDICATOR",
+     "programIndicator": {
+      "id": "PiAtenTot01"
+     }
+    }
+   ],
+   "relativePeriods": {
+    "last14Days": true
    },
    "organisationUnits": [
     {
@@ -692,7 +733,7 @@
    "id": "VisAtenNue1",
    "name": "Atenciones y pacientes nuevos por semana",
    "type": "LINE",
-   "description": "Consultas y pacientes que llegaron por primera vez, por semana",
+   "description": "Consultas y pacientes que llegaron por primera vez en las 12 semanas anteriores a esta",
    "dataDimensionItems": [
     {
      "dataDimensionItemType": "PROGRAM_INDICATOR",
@@ -708,8 +749,7 @@
     }
    ],
    "relativePeriods": {
-    "last12Weeks": true,
-    "thisWeek": true
+    "last12Weeks": true
    },
    "organisationUnits": [
     {
@@ -1035,14 +1075,25 @@
    "description": "Cómo va la jornada de la brigada. Los datos se actualizan cada media hora.",
    "dashboardItems": [
     {
+     "id": "DiAtenHoy01",
+     "type": "VISUALIZATION",
+     "visualization": {
+      "id": "VisAtenHoy1"
+     },
+     "x": 0,
+     "y": 0,
+     "width": 15,
+     "height": 12
+    },
+    {
      "id": "DiAtenSem01",
      "type": "VISUALIZATION",
      "visualization": {
       "id": "VisAtenSem1"
      },
-     "x": 0,
+     "x": 15,
      "y": 0,
-     "width": 20,
+     "width": 15,
      "height": 12
     },
     {
@@ -1051,9 +1102,9 @@
      "visualization": {
       "id": "VisFiebSem1"
      },
-     "x": 20,
+     "x": 30,
      "y": 0,
-     "width": 20,
+     "width": 15,
      "height": 12
     },
     {
@@ -1062,9 +1113,9 @@
      "visualization": {
       "id": "VisSexo0001"
      },
-     "x": 40,
+     "x": 45,
      "y": 0,
-     "width": 20,
+     "width": 15,
      "height": 12
     },
     {

@@ -36,30 +36,46 @@ La pantalla de entrada no tiene Quick Connect ni «Contraseña olvidada», que n
 
 Desde la Comunidad, `admin` recibe `403` y el log de Jellyfin dice `remote access disabled and user not in local network`. Así queda cerrada toda la administración, interfaz y API, sin reglas de rutas en Caddy.
 
-## Material de prueba
+## Material y cómo se agrega más
 
-La lista está en `platform/ansible/inventarios/kit/group_vars/all/contenido.yml` (`contenido_medios`), con la URL, el sha256 y la licencia de cada archivo. El rol los descarga en base (R-05) solo si faltan o no coinciden. Todo es de dominio público (Internet Archive y LibriVox) y viene en H.264 Constrained Baseline con AAC, a 480p o menos y unos 0,8 Mb/s, o en MP3 a 64 kb/s.
+La lista está en `platform/ansible/inventarios/kit/group_vars/all/contenido.yml` (`contenido_medios`), con la URL, el sha256, el autor y la licencia de cada archivo. El rol lo descarga en base (R-05) solo si falta o no coincide. Si un archivo viene en otro formato (`preparar: true`), el rol lo convierte una sola vez en comunidad01, con el `ffmpeg` de la imagen de Jellyfin, a H.264 Main y AAC estéreo en MP4, de 480p como mucho y unos 1 Mb/s (10.1). El original queda en `/srv/medios/originales`, fuera de las bibliotecas, y el MP4 se escribe con otro nombre y se renombra al final, para que Jellyfin no vea un archivo a medias.
 
-| Biblioteca | Archivo | Formato |
-|---|---|---|
-| Salud | Resfriados y estornudos (1955) | 640×480, 9 min |
-| Salud | Higiene y cuidado personal (1941) | 640×480, 10 min |
-| Comunidad | Sorpresa de Navidad (1947) | 320×240, 8 min |
-| Comunidad | La luciérnaga y el vidrio (fábula) | MP3, 6 min |
-| Comunidad | La liebre y el cangrejo (fábula) | MP3, 9 min |
+| Biblioteca | Archivo | Autor y licencia | Duración |
+|---|---|---|---|
+| Salud | Lo que necesitas saber acerca del lavado de manos | CDC, dominio público | 2 min |
+| Salud | Acabe con los microbios, lávese las manos | CDC, dominio público | 3 min |
+| Salud | Protege la salud de tu bebé con las vacunas | CDC, dominio público | 30 s |
+| Salud | Lactancia materna, extracción manual de la leche | SOS Telemedicina, Universidad Central de Venezuela, CC BY-SA 4.0 | 2 min |
+| Comunidad | Caminandes, Llama Drama | Pablo Vazquez, Beorn Leonard y Francesco Siddi (Blender), CC BY 3.0 | 1,5 min |
+| Comunidad | Caminandes 3, Llamigos | Blender Foundation, CC BY 3.0 | 2,5 min |
+| Comunidad | La luciérnaga y el vidrio (fábula) | LibriVox, dominio público | 6 min |
+| Comunidad | La liebre y el cangrejo (fábula) | LibriVox, dominio público | 9 min |
 
-Los dos videos de salud están en inglés. El flujo de publicación desde el recurso `contenido` (platform#10) cambiará este material por contenido propio. Un video nuevo tiene que venir ya en H.264/AAC a 480p (≈ 1 Mb/s) y un audio en MP3. Como `comunidad` no puede transcodificar, un archivo en otro formato no se reproduce, en lugar de cargar la CPU.
+Los videos vienen de Wikimedia Commons y los audios de LibriVox (Internet Archive). Las animaciones de Caminandes no tienen diálogos. Las licencias CC BY y CC BY-SA piden citar al autor, que queda en esta tabla y en `contenido.yml`.
+
+**Para agregar un archivo** hay que hacer tres cosas:
+
+1. Agregar una entrada a `contenido_medios` con `archivo` (el título que se verá, terminado en `.mp4` o `.mp3`), `biblioteca` (`salud` o `comunidad`), `url`, `sha256` del archivo que se descarga (`sha256sum`), `autor` y `licencia`.
+2. Si no viene ya en H.264/AAC MP4 de 480p o en MP3, agregar `preparar: true`.
+3. Ejecutar `ansible-playbook playbooks/comunidad01.yml`.
+
+Jellyfin vigila las carpetas y lo muestra solo.
+
+**Quitar.** Al sacar una entrada de la lista, el rol borra ese archivo de su biblioteca en la siguiente ejecución. Solo borra lo que puso él (lo anota en `/srv/jellyfin/medios-del-rol.txt`), así que no toca lo que llegue por el recurso `contenido` cuando exista el flujo de publicación (platform#10).
+
+Como `comunidad` no puede transcodificar, un archivo que llegue en otro formato por fuera del rol no se reproduce, en lugar de cargar la CPU.
 
 ## Cómo se despliega
 
 Desde `platform/ansible/`, con `ansible-playbook playbooks/comunidad01.yml`. El rol:
 
-1. Crea `/srv/medios/videos/{salud,comunidad}` y descarga el material.
-2. Copia `compose.yml` a `/srv/jellyfin/`, levanta el contenedor y espera a que `/health` responda `Healthy`.
-3. Si el asistente inicial no se ha hecho, lo completa (español, Colombia y la cuenta `admin`).
-4. Entra como `admin` y aplica la red, Quick Connect apagado, el aviso y el CSS de la pantalla de entrada, las bibliotecas que falten, la cuenta `comunidad` y las políticas. Cada ajuste solo se guarda si difiere del rol. Si cambia la red, reinicia el contenedor al final.
+1. Copia `compose.yml` a `/srv/jellyfin/`.
+2. Crea `/srv/medios/videos/{salud,comunidad}` y `/srv/medios/originales`, descarga el material, prepara lo que haga falta y quita los archivos del rol que salieron de la lista.
+3. Levanta el contenedor y espera a que `/health` responda `Healthy`.
+4. Si el asistente inicial no se ha hecho, lo completa (español, Colombia y la cuenta `admin`).
+5. Entra como `admin` y aplica la red, Quick Connect apagado, el aviso y el CSS de la pantalla de entrada, las bibliotecas que falten, la cuenta `comunidad` y las políticas. Cada ajuste solo se guarda si difiere del rol. Si cambia la red, reinicia el contenedor al final.
 
-La imagen se descarga por F-17 (en base).
+La imagen y el material se descargan por F-17 (en base). La primera vez, con los 6 videos para preparar, el playbook tardó unos 10 minutos.
 
 ## Cómo se ve desde la máquina propia
 
@@ -84,7 +100,8 @@ Por el túnel la conexión llega desde kit01, que es red local, así que `admin`
 | En el navegador, tocar «comunidad» y «Iniciar sesión» sin contraseña | La página de inicio con las bibliotecas Salud y Comunidad |
 | El login de `admin` por Caddy con un `X-Forwarded-For` falso de la Interna | `403` (Jellyfin ve la IP real) |
 | `POST /Items/<id>/PlaybackInfo` como `comunidad` con el perfil de un navegador móvil | `SupportsDirectPlay: true` y sin `TranscodingUrl` |
-| 5 descargas de `/Videos/<id>/stream?static=true` a 1 Mb/s durante 60 s, con `docker stats` y `pgrep ffmpeg` | Jellyfin con 0,3 % de CPU de media (pico 1,8 %), unos 190 MB y ningún `ffmpeg` |
+| `ffprobe` de cada MP4 | `h264` Main y `aac`, 480 de alto o menos |
+| 8 descargas simultáneas de `/Videos/<id>/stream?static=true` y `/Audio/<id>/stream?static=true` a 1 Mb/s durante 60 s, con `docker stats` y `pgrep ffmpeg` | Jellyfin con 0,2 % de CPU de media (pico 0,6 %), unos 270 MB y ningún `ffmpeg` |
 | En el panel de Jellyfin, una reproducción en curso | "Reproducción directa" |
 
 ## Diagnóstico

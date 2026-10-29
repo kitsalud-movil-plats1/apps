@@ -6,3 +6,5 @@ kiwix_zim_dir: /srv/medios/zim
 kiwix_estado: started
 # Archivos del repositorio apps que se copian tal cual
 kiwix_fuente: "{{ role_path }}/../../../comunidad01/kiwix"
+# Segundos sin cambios en la carpeta de ZIM antes de reiniciar Kiwix
+kiwix_recarga_espera: 30

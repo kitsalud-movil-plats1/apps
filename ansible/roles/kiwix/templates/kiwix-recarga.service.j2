@@ -1,0 +1,10 @@
+# {{ ansible_managed }} (rol kiwix, platform#10)
+[Unit]
+Description=Reinicio de Kiwix con los ZIM nuevos
+
+[Service]
+Type=oneshot
+# Espera a que la publicación termine de mover los archivos
+ExecStartPre=/bin/sleep {{ kiwix_recarga_espera }}
+WorkingDirectory={{ kiwix_dir }}
+ExecStart=/usr/bin/docker compose restart

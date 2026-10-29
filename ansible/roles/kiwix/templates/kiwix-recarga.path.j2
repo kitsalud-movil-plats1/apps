@@ -1,0 +1,12 @@
+# {{ ansible_managed }} (rol kiwix, platform#10)
+# kiwix-serve lee la lista de ZIM al arrancar. Cuando la publicación cambia
+# algo en {{ kiwix_zim_dir }}, se reinicia
+[Unit]
+Description=Cambios en los ZIM de la biblioteca
+
+[Path]
+PathChanged={{ kiwix_zim_dir }}
+Unit=kiwix-recarga.service
+
+[Install]
+WantedBy=paths.target

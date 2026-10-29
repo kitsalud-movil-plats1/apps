@@ -1,0 +1,16 @@
+# {{ ansible_managed }} (rol publicacion_destino, platform#10)
+# Publicación desde {{ publicacion_destino_origen }} (F-12). Desde sus direcciones solo
+# entra {{ publicacion_usuario }}, y {{ publicacion_usuario }} solo con su llave y solo ejecuta rsync.
+Match Address {{ publicacion_destino_origenes | join(',') }}
+	AllowUsers {{ publicacion_usuario }}
+
+Match User {{ publicacion_usuario }}
+	AuthorizedKeysFile {{ publicacion_destino_llaves }}
+	AuthenticationMethods publickey
+	PasswordAuthentication no
+	KbdInteractiveAuthentication no
+	ForceCommand {{ publicacion_destino_comando }}
+	DisableForwarding yes
+	PermitTTY no
+	PermitTunnel no
+	PermitUserRC no

@@ -1,0 +1,29 @@
+# {{ ansible_managed }} (rol publicacion_destino, platform#10)
+# rsync en modo demonio que lanza sshd para la llave de {{ publicacion_destino_origen }}.
+# Corre como {{ publicacion_usuario }}, sin chroot, así que los enlaces simbólicos
+# que lleguen quedan inutilizados (munge symlinks).
+use chroot = no
+munge symlinks = yes
+numeric ids = yes
+# Solo escritura y sin listar los módulos: clinica01 no puede leer nada
+read only = no
+write only = yes
+list = no
+# Lo que llega queda legible para Jellyfin y Kiwix
+incoming chmod = Du=rwx,Dgo=rx,Fu=rw,Fgo=r
+timeout = 600
+# Sin log file, el demonio registra en syslog y llega al log central (F-15)
+syslog tag = publicacion
+transfer logging = yes
+{% for m in publicacion_destino_modulos %}
+
+[{{ m.nombre }}]
+	comment = {{ m.comentario }}
+	path = {{ m.ruta }}
+{% if m.excluir_de is defined %}
+	exclude from = {{ m.excluir_de }}
+{% endif %}
+{% if m.excluir | length > 0 %}
+	exclude = {{ m.excluir | join(' ') }}
+{% endif %}
+{% endfor %}

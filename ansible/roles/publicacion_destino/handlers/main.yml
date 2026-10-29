@@ -1,0 +1,13 @@
+---
+# Los dos escuchan "Recargar sshd" y corren en este orden; si sshd -t falla,
+# el play se detiene y sshd no se recarga con una configuración rota
+- name: Validar la configuración de sshd
+  ansible.builtin.command: /usr/sbin/sshd -t
+  changed_when: false
+  listen: Recargar sshd
+
+- name: Recargar el servicio ssh
+  ansible.builtin.systemd_service:
+    name: ssh
+    state: reloaded
+  listen: Recargar sshd

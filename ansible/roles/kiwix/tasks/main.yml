@@ -1,41 +1,19 @@
 ---
-- name: Carpeta de medios y de los ZIM
+- name: Carpeta de medios
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ kiwix_zim_dir | dirname }}"
     state: directory
     owner: root
     group: root
     mode: "0755"
-  loop: ["{{ kiwix_zim_dir | dirname }}", "{{ kiwix_zim_dir }}"]
 
-# Solo se descargan si faltan o no coinciden con el sha256 (F-17, solo IPv4)
-- name: ZIM de la biblioteca
-  ansible.builtin.get_url:
-    url: "{{ contenido_zim_origen }}/{{ item.carpeta }}/{{ item.archivo }}"
-    dest: "{{ kiwix_zim_dir }}/{{ item.archivo }}"
-    checksum: "sha256:{{ item.sha256 }}"
-    owner: root
-    group: root
-    mode: "0644"
-    timeout: 120
-  loop: "{{ contenido_zim }}"
-  loop_control:
-    label: "{{ item.archivo }}"
-  notify: Reiniciar kiwix
-
-- name: ZIM presentes
-  ansible.builtin.find:
-    paths: "{{ kiwix_zim_dir }}"
-    patterns: "*.zim"
-  register: kiwix_zim_hoy
-
-# Kiwix sirve todos los ZIM de la carpeta; los que salen de la lista se quitan
-- name: Quitar los ZIM que ya no están en la lista
+# Los ZIM llegan del recurso contenido de clinica01 (platform#10), que los
+# escribe con su usuario; por eso el rol no fija el dueño de la carpeta
+- name: Carpeta de los ZIM
   ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop: "{{ kiwix_zim_hoy.files | map(attribute='path') | reject('in', contenido_zim | map(attribute='archivo') | map('regex_replace', '^', kiwix_zim_dir ~ '/') | list) | list }}"
-  notify: Reiniciar kiwix
+    path: "{{ kiwix_zim_dir }}"
+    state: directory
+    mode: "0755"
 
 - name: Directorio del Compose
   ansible.builtin.file:

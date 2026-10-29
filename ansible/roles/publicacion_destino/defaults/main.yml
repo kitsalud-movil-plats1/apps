@@ -12,16 +12,19 @@ publicacion_destino_origenes:
   - "{{ equipos[publicacion_destino_origen].ipv4 }}"
   - "{{ equipos[publicacion_destino_origen].ipv6 }}"
 
-# Módulos de rsync. Lo que pone el rol jellyfin (su registro) y su archivo a
-# medio preparar son excluidos del demonio, así que rsync nunca los escribe ni
-# los borra
+# Módulos de rsync y las carpetas de cada uno donde escribe la publicación,
+# que pasan a ser de su usuario. Lo que pone el rol jellyfin (su registro) y su
+# archivo a medio preparar son excluidos del demonio, así que rsync nunca los
+# escribe ni los borra
 publicacion_destino_modulos:
   - nombre: zim
     ruta: /srv/medios/zim
     comentario: ZIM de la biblioteca (Kiwix)
+    carpetas: ["."]
     excluir: []
   - nombre: videos
     ruta: /srv/medios/videos
     comentario: Bibliotecas de Jellyfin
+    carpetas: [salud, comunidad]
     excluir_de: /srv/jellyfin/medios-del-rol.txt
     excluir: [.preparando.mp4]

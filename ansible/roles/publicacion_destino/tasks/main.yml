@@ -22,6 +22,18 @@
     shell: /bin/sh
     password: "!"
 
+# kiwix y jellyfin crean estas carpetas sin fijar el dueño
+- name: Carpetas donde escribe la publicación
+  ansible.builtin.file:
+    path: "{{ (item.0.ruta ~ '/' ~ item.1) | normpath }}"
+    state: directory
+    owner: "{{ publicacion_usuario }}"
+    group: "{{ publicacion_usuario }}"
+    mode: "0755"
+  loop: "{{ publicacion_destino_modulos | subelements('carpetas') }}"
+  loop_control:
+    label: "{{ (item.0.ruta ~ '/' ~ item.1) | normpath }}"
+
 - name: Configuración del demonio de rsync
   ansible.builtin.template:
     src: rsyncd.conf.j2

@@ -11,9 +11,10 @@ Aplicaciones del kit desplegadas con Docker Compose dentro de las VMs.
 | `comunidad01/kiwix/` | comunidad01 | Biblioteca de salud y contenido infantil (ZIM) | `biblioteca.salud.movil` |
 | `comunidad01/jellyfin/` | comunidad01 | Audio y video de contenido médico general y para la comunidad, sin transcodificación, con la cuenta `comunidad` sin contraseña y la administración solo desde la Interna y NetBird | `videos.salud.movil` |
 | `comunidad01/formularios/` | comunidad01 | Prerregistro mínimo y asistido (Flask), que solo inserta en PostgreSQL de clinica01 | `registro.salud.movil` |
+| `comunidad01/medios/` | comunidad01 | Carpeta de medios de Kiwix y Jellyfin y destino de la publicación desde clinica01 (rsync en modo demonio, de solo escritura, para una llave de clinica01) | - |
 
-comunidad01 es la única VM a la que llega la comunidad (80/443). No guarda datos de pacientes, porque los formularios se escriben en PostgreSQL de clinica01 con un usuario que solo tiene permiso de `INSERT` (D-07 en `docs`). El contenido llega desde el recurso SMB `contenido` de clinica01 por `rsync`.
+comunidad01 es la única VM a la que llega la comunidad (80/443). No guarda datos de pacientes, porque los formularios se escriben en PostgreSQL de clinica01 con un usuario que solo tiene permiso de `INSERT` (D-07 en `docs`). El contenido llega desde el recurso SMB `contenido` de clinica01 por `rsync` sobre SSH, con una llave que solo puede escribir en la carpeta de medios (`comunidad01/medios/`).
 
 Cada servicio incluye un `.env.example`. Los valores reales nunca se versionan; los genera Ansible desde el vault.
 
-Los roles de Ansible de este repositorio están en `ansible/roles/` (`docker`, `dhis2`, `consultas`, `kiwix`, `jellyfin`, `formularios` y `caddy`) y se ejecutan desde `platform/ansible`, que los encuentra por `roles_path`.
+Los roles de Ansible de este repositorio están en `ansible/roles/` (`docker`, `dhis2`, `consultas`, `kiwix`, `jellyfin`, `formularios`, `caddy` y `publicacion_destino`) y se ejecutan desde `platform/ansible`, que los encuentra por `roles_path`.

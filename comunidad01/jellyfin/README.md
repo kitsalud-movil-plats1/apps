@@ -61,7 +61,9 @@ Los videos vienen de Wikimedia Commons y los audios de LibriVox (Internet Archiv
 
 Jellyfin vigila las carpetas y lo muestra solo.
 
-**Quitar.** Al sacar una entrada de la lista, el rol borra ese archivo de su biblioteca en la siguiente ejecución. Solo borra lo que puso él (lo anota en `/srv/jellyfin/medios-del-rol.txt`), así que no toca lo que llegue por el recurso `contenido` cuando exista el flujo de publicación (platform#10).
+**Quitar.** Al sacar una entrada de la lista, el rol borra ese archivo de su biblioteca en la siguiente ejecución. Solo borra lo que puso él (lo anota en `/srv/jellyfin/medios-del-rol.txt`), así que no toca lo que llega por el recurso `contenido`. Sin ese registro no borra nada.
+
+**Lo que sube el personal.** Llega del recurso SMB `contenido` de clinica01 (`salud/` y `comunidad/`) con la publicación ([`../medios/`](../medios/)) y aparece solo, por el monitor de cambios de las bibliotecas. El demonio de rsync de la publicación excluye los archivos del registro, así que nunca los sobrescribe ni los borra. Las carpetas de las bibliotecas son del usuario `publicacion`; el rol las crea sin fijar el dueño.
 
 Como `comunidad` no puede transcodificar, un archivo que llegue en otro formato por fuera del rol no se reproduce, en lugar de cargar la CPU.
 

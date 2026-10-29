@@ -1,0 +1,30 @@
+---
+# Destino de la publicación de contenido en comunidad01 (sección 10.5, F-12,
+# platform#10). clinica01 entra con una llave que solo ejecuta rsync en modo
+# demonio, con dos módulos de solo escritura.
+publicacion_destino_dir: /etc/kitsalud/publicacion
+publicacion_destino_llaves: /etc/ssh/publicacion/authorized_keys
+publicacion_destino_comando: "rsync --server --daemon --config={{ publicacion_destino_dir }}/rsyncd.conf ."
+
+# Equipo que publica, con sus dos direcciones (red.yml)
+publicacion_destino_origen: clinica01
+publicacion_destino_origenes:
+  - "{{ equipos[publicacion_destino_origen].ipv4 }}"
+  - "{{ equipos[publicacion_destino_origen].ipv6 }}"
+
+# Módulos de rsync y las carpetas de cada uno donde escribe la publicación,
+# que pasan a ser de su usuario. Lo que pone el rol jellyfin (su registro) y su
+# archivo a medio preparar son excluidos del demonio, así que rsync nunca los
+# escribe ni los borra
+publicacion_destino_modulos:
+  - nombre: zim
+    ruta: /srv/medios/zim
+    comentario: ZIM de la biblioteca (Kiwix)
+    carpetas: ["."]
+    excluir: []
+  - nombre: videos
+    ruta: /srv/medios/videos
+    comentario: Bibliotecas de Jellyfin
+    carpetas: [salud, comunidad]
+    excluir_de: /srv/jellyfin/medios-del-rol.txt
+    excluir: [.preparando.mp4]

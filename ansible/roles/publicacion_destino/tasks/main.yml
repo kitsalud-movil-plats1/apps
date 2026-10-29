@@ -1,0 +1,79 @@
+---
+- name: Carpetas de la configuración y de la llave, de root
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ publicacion_destino_dir }}"
+    - "{{ publicacion_destino_llaves | dirname }}"
+
+# Necesita una shell válida para que sshd ejecute el comando forzado; sin
+# contraseña y con el comando forzado no puede abrir una sesión. Su home es la
+# carpeta de la configuración, donde no puede escribir
+- name: Usuario de la publicación, sin contraseña
+  ansible.builtin.user:
+    name: "{{ publicacion_usuario }}"
+    system: true
+    home: "{{ publicacion_destino_dir }}"
+    create_home: false
+    shell: /bin/sh
+    password: "!"
+
+# kiwix y jellyfin crean estas carpetas sin fijar el dueño
+- name: Carpetas donde escribe la publicación
+  ansible.builtin.file:
+    path: "{{ (item.0.ruta ~ '/' ~ item.1) | normpath }}"
+    state: directory
+    owner: "{{ publicacion_usuario }}"
+    group: "{{ publicacion_usuario }}"
+    mode: "0755"
+  loop: "{{ publicacion_destino_modulos | subelements('carpetas') }}"
+  loop_control:
+    label: "{{ (item.0.ruta ~ '/' ~ item.1) | normpath }}"
+
+- name: Configuración del demonio de rsync
+  ansible.builtin.template:
+    src: rsyncd.conf.j2
+    dest: "{{ publicacion_destino_dir }}/rsyncd.conf"
+    owner: root
+    group: root
+    mode: "0644"
+
+# La llave pública se lee en clinica01; la privada nunca sale de allá
+- name: Llave pública de {{ publicacion_destino_origen }}
+  ansible.builtin.slurp:
+    src: "{{ publicacion_llave }}.pub"
+  delegate_to: "{{ publicacion_destino_origen }}"
+  register: publicacion_destino_llave
+
+# Fuera de la carpeta del usuario y de root, así el usuario no puede cambiarla
+- name: Llave autorizada solo desde {{ publicacion_destino_origen }} y solo para rsync
+  ansible.builtin.copy:
+    content: >-
+      command="{{ publicacion_destino_comando }}",restrict,from="{{ publicacion_destino_origenes | join(',') }}"
+      {{ publicacion_destino_llave.content | b64decode | trim }}
+    dest: "{{ publicacion_destino_llaves }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: sshd para la publicación
+  ansible.builtin.template:
+    src: sshd-publicacion.conf.j2
+    dest: /etc/ssh/sshd_config.d/20-publicacion.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Recargar sshd
+
+- name: SSH desde {{ publicacion_destino_origen }} en ufw (F-12)
+  community.general.ufw:
+    rule: allow
+    proto: tcp
+    port: "22"
+    from_ip: "{{ item }}"
+    comment: publicacion
+  loop: "{{ publicacion_destino_origenes }}"

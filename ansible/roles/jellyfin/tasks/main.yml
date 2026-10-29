@@ -24,7 +24,7 @@
     group: root
     mode: "0644"
 
-- name: Carpetas de las bibliotecas y de los originales
+- name: Carpeta de las bibliotecas y de los originales
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -33,9 +33,18 @@
     mode: "0755"
   loop:
     - "{{ jellyfin_medios_dir }}"
-    - "{{ jellyfin_medios_dir }}/salud"
-    - "{{ jellyfin_medios_dir }}/comunidad"
     - "{{ jellyfin_originales_dir }}"
+
+# Lo que sube el personal llega del recurso contenido de clinica01
+# (platform#10), que escribe con su usuario; por eso el rol no fija el dueño
+- name: Carpeta de cada biblioteca
+  ansible.builtin.file:
+    path: "{{ jellyfin_medios_dir }}/{{ item.carpeta }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ jellyfin_bibliotecas }}"
+  loop_control:
+    label: "{{ item.carpeta }}"
 
 # Solo se descargan si faltan o no coinciden con el sha256 (F-17, solo IPv4).
 # Lo que ya viene listo va directo a su biblioteca
@@ -85,19 +94,14 @@
     label: "{{ item.archivo }}"
 
 # El rol solo quita lo que puso él: lleva un registro de sus archivos y borra
-# los que salieron de la lista. Lo que llegue por el recurso contenido
-# (platform#10) no se toca. Sin registro, todo lo de las bibliotecas es del rol
+# los que salieron de la lista. Lo que llega por el recurso contenido
+# (platform#10) no se toca, y sin registro no se borra nada. La publicación
+# usa el mismo registro para no escribir ni borrar estos archivos
 - name: Registro de los archivos del rol
   ansible.builtin.slurp:
     src: "{{ jellyfin_dir }}/medios-del-rol.txt"
   register: jellyfin_registro
   failed_when: false
-
-- name: Archivos de las bibliotecas
-  ansible.builtin.find:
-    paths: ["{{ jellyfin_medios_dir }}/salud", "{{ jellyfin_medios_dir }}/comunidad"]
-  register: jellyfin_medios_hoy
-  when: jellyfin_registro.content is not defined
 
 - name: Quitar los archivos del rol que ya no están en la lista
   ansible.builtin.file:
@@ -105,9 +109,7 @@
     state: absent
   loop: "{{ jellyfin_anteriores | difference(jellyfin_actuales) }}"
   vars:
-    jellyfin_anteriores: >-
-      {{ (jellyfin_registro.content | b64decode).splitlines() if jellyfin_registro.content is defined
-         else jellyfin_medios_hoy.files | map(attribute='path') | map('relpath', jellyfin_medios_dir) | list }}
+    jellyfin_anteriores: "{{ (jellyfin_registro.content | b64decode).splitlines() if jellyfin_registro.content is defined else [] }}"
     jellyfin_actuales: "{{ contenido_medios | map(attribute='biblioteca') | zip(contenido_medios | map(attribute='archivo')) | map('join', '/') | list }}"
 
 - name: Registro de los archivos del rol al día

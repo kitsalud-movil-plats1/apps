@@ -33,6 +33,9 @@ services:
       - "${IP4}:5432:5432"
       - "[${IP6}]:5432:5432"
     mem_limit: 2g
+    # Al apagar la VM (apagado ordenado, platform#13) PostgreSQL tiene hasta
+    # 60 s para cerrar limpio; con los 10 s de Docker podía recibir SIGKILL
+    stop_grace_period: 60s
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -58,6 +61,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     mem_limit: 4g
+    stop_grace_period: 60s
     depends_on:
       db:
         condition: service_healthy

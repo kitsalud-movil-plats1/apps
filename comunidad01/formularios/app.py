@@ -32,7 +32,6 @@ TIPOS_DOCUMENTO = [
     ("RC", "Registro civil"),
     ("CE", "Cédula de extranjería"),
     ("OTRO", "Otro documento"),
-    ("NINGUNO", "No tengo documento"),
 ]
 MOTIVOS = [
     ("CONTROL", "Control o revisión"),
@@ -70,11 +69,11 @@ def validar(f):
             errores[campo] = "Es demasiado largo."
     if d["tipo_documento"] not in dict(TIPOS_DOCUMENTO):
         errores["tipo_documento"] = "Elija el tipo de documento."
-    elif d["tipo_documento"] != "NINGUNO":
-        if not re.fullmatch(r"[0-9A-Za-z-]{3,20}", d["numero_documento"]):
-            errores["numero_documento"] = "Escriba el número del documento, sin puntos ni espacios."
-    else:
-        d["numero_documento"] = ""
+    # El personal busca a la persona por su número, así que es obligatorio
+    if not d["numero_documento"]:
+        errores["numero_documento"] = "Escriba el número del documento."
+    elif not re.fullmatch(r"[0-9A-Za-z-]{3,20}", d["numero_documento"]):
+        errores["numero_documento"] = "Escriba el número del documento, sin puntos ni espacios."
     if d["fecha_nacimiento"]:
         try:
             nacimiento = date.fromisoformat(d["fecha_nacimiento"])
@@ -101,7 +100,7 @@ def guardar(d):
             "INSERT INTO prerregistros (codigo, nombres, apellidos, tipo_documento, numero_documento,"
             " fecha_nacimiento, celular, motivo, detalle, autoriza_datos)"
             " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (codigo, d["nombres"], d["apellidos"], d["tipo_documento"], d["numero_documento"] or None,
+            (codigo, d["nombres"], d["apellidos"], d["tipo_documento"], d["numero_documento"],
              d["fecha_nacimiento"] or None, d["celular"] or None, d["motivo"], d["detalle"] or None,
              d["autoriza_datos"]),
         )

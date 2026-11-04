@@ -23,8 +23,8 @@
   </select>
   {{ error('tipo_documento') }}
 
-  <label for="numero_documento">Número de documento <span class="nota">(si no tiene, déjelo vacío)</span></label>
-  <input id="numero_documento" name="numero_documento" inputmode="numeric" maxlength="20" value="{{ datos.get('numero_documento', '') }}">
+  <label for="numero_documento">Número de documento</label>
+  <input id="numero_documento" name="numero_documento" inputmode="numeric" maxlength="20" required aria-required="true" value="{{ datos.get('numero_documento', '') }}" {% if errores.get('numero_documento') %}aria-invalid="true"{% endif %}>
   {{ error('numero_documento') }}
 
   <label for="fecha_nacimiento">Fecha de nacimiento <span class="nota">(opcional)</span></label>

@@ -16,8 +16,8 @@ Prerregistro mínimo y asistido para la sala de espera (R8, D-07). La persona ll
 | Campo | Obligatorio | Validación |
 |---|---|---|
 | Nombres y apellidos | Sí | Hasta 80 caracteres cada uno |
-| Tipo de documento | Sí | CC, TI, RC, CE, otro o "no tengo documento" |
-| Número de documento | Si tiene documento | Letras, números y guiones, de 3 a 20 |
+| Tipo de documento | Sí | CC, TI, RC, CE u otro |
+| Número de documento | Sí | Letras, números y guiones, de 3 a 20. El personal busca a la persona por él |
 | Fecha de nacimiento | No | Entre 1900 y hoy |
 | Celular | No | De 7 a 15 dígitos |
 | Motivo | Sí | Control, fiebre o malestar, dolor, embarazo, vacunación u otro |

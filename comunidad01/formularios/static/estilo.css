@@ -1,6 +1,10 @@
 /* Apariencia común de las páginas del kit (portal, prerregistro, consulta y
-   certificado). Las fuentes van junto a este archivo, en fuentes/, para que
-   todo se vea igual sin Internet. Licencia SIL OFL 1.1 en fuentes/OFL.txt */
+   certificado). La paleta y los patrones (foco amarillo, botón con sombra,
+   bordes de campo oscuros, fondo gris claro) siguen el sistema de diseño del
+   servicio de salud del Reino Unido (service-manual.nhs.uk), pensado para
+   personas de todas las edades y niveles de lectura, con contraste AA. Las
+   fuentes van junto a este archivo, en fuentes/, para que todo se vea igual sin
+   Internet. Licencia SIL OFL 1.1 en fuentes/OFL.txt */
 @font-face {
   font-family: "Atkinson Hyperlegible Next";
   src: url("fuentes/atkinson-hyperlegible-next.woff2") format("woff2");
@@ -15,31 +19,33 @@
 }
 
 :root {
-  --tinta: #17322d;
-  --gris: #57625e;
-  --verde: #1d6b4f;
-  --verde-hondo: #134a37;
-  --verde-suave: #e3eee7;
-  --papel: #f6f3ec;
-  --hoja: #fffdf8;
-  --borde: #ddd5c6;
-  --borde-campo: #8a8577;
-  --ladrillo: #a3341f;
-  --ladrillo-suave: #f8e4dc;
-  --foco: #d99a00;
-  --texto: "Atkinson Hyperlegible Next", sans-serif;
-  --titulo: "Literata", Georgia, serif;
+  --tinta: #212b32;
+  --gris: #4c6272;
+  --azul: #005eb8;
+  --azul-hondo: #003087;
+  --azul-suave: #e8f1fa;
+  --verde: #007f3b;
+  --verde-hondo: #00401e;
+  --fondo: #f0f4f5;
+  --blanco: #ffffff;
+  --borde: #d8dde0;
+  --borde-campo: #4c6272;
+  --rojo: #d5281b;
+  --rojo-suave: #fbe9e7;
+  --foco: #ffeb3b;
+  --fuente: "Atkinson Hyperlegible Next", sans-serif;
+  --fuente-titulo: "Literata", Georgia, serif;
 }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  font-family: var(--texto);
+  font-family: var(--fuente);
   font-size: 1.125rem;
   line-height: 1.55;
   color: var(--tinta);
-  background: var(--papel);
+  background: var(--fondo);
 }
 
 .barra {
@@ -48,43 +54,65 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: .6rem 1rem;
-  padding: .75rem 1.1rem;
-  background: var(--verde-hondo);
-  color: #fff;
+  padding: .85rem 1.1rem;
+  color: var(--blanco);
+  background: var(--azul);
 }
 .marca {
   display: flex;
   align-items: center;
-  gap: .6rem;
+  gap: .65rem;
   margin: 0;
-  font-family: var(--titulo);
-  font-size: 1.05rem;
+  font-family: var(--fuente-titulo);
+  font-size: 1.1rem;
   font-weight: 600;
   color: inherit;
   text-decoration: none;
 }
-.marca svg { width: 1.9rem; height: 1.9rem; flex: none; }
+.marca svg { width: 2rem; height: 2rem; flex: none; }
 
-main { max-width: 36rem; margin: 0 auto; padding: 1.6rem 1.1rem 3.5rem; }
+main { max-width: 36rem; margin: 0 auto; padding: 1.8rem 1.1rem 3.5rem; }
 
-h1, h2 { font-family: var(--titulo); color: var(--tinta); line-height: 1.2; }
-h1 { font-size: 1.9rem; font-weight: 600; margin: .2rem 0 .7rem; letter-spacing: -.01em; }
-h2 { font-size: 1.3rem; font-weight: 600; margin: 2.2rem 0 .6rem; }
+h1, h2 { font-family: var(--fuente-titulo); color: var(--tinta); line-height: 1.2; }
+h1 { font-size: 2rem; font-weight: 700; margin: .1rem 0 .8rem; letter-spacing: -.01em; }
+h2 { font-size: 1.35rem; font-weight: 700; margin: 2.2rem 0 .6rem; }
 p { margin: .6rem 0; }
-.entrada { font-size: 1.2rem; color: var(--gris); }
+.entrada { font-size: 1.2rem; }
 .nota { color: var(--gris); font-size: 1rem; }
-a { color: var(--verde); text-underline-offset: .18em; }
-a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
-  outline: 3px solid var(--foco);
-  outline-offset: 2px;
+a { color: var(--azul); text-decoration-thickness: 1px; text-underline-offset: .18em; }
+a:hover { color: var(--azul-hondo); text-decoration-thickness: 3px; }
+
+/* Foco visible y fuerte: fondo amarillo y línea negra debajo */
+a:focus-visible {
+  outline: 4px solid transparent;
+  color: var(--tinta);
+  background: var(--foco);
+  box-shadow: 0 -2px var(--foco), 0 4px var(--tinta);
+  text-decoration: none;
+}
+button:focus-visible, .boton:focus-visible {
+  outline: 4px solid transparent;
+  color: var(--tinta);
+  background: var(--foco);
+  box-shadow: 0 4px 0 var(--tinta);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 4px solid var(--foco);
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 2px var(--tinta);
 }
 
 .hoja {
-  background: var(--hoja);
-  border: 1px solid var(--borde);
-  border-radius: 16px;
-  padding: 1.1rem 1.2rem;
   margin: 1rem 0;
+  padding: 1.1rem 1.2rem;
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 4px;
+}
+.destacado {
+  margin: 1.2rem 0;
+  padding: .3rem 0 .3rem 1.1rem;
+  border-left: 8px solid var(--azul);
 }
 
 button, .boton {
@@ -93,55 +121,57 @@ button, .boton {
   justify-content: center;
   gap: .6rem;
   width: 100%;
-  min-height: 3.4rem;
-  margin: 1.4rem 0 0;
+  min-height: 3.3rem;
+  margin: 1.5rem 0 .3rem;
   padding: .8rem 1.2rem;
   font: inherit;
   font-weight: 700;
   font-size: 1.15rem;
-  color: #fff;
+  color: var(--blanco);
   background: var(--verde);
-  border: 0;
-  border-radius: 12px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 var(--verde-hondo);
   text-decoration: none;
   cursor: pointer;
 }
-button:hover, .boton:hover { background: var(--verde-hondo); }
+button:hover, .boton:hover { color: var(--blanco); background: #00662f; }
+button:active, .boton:active { transform: translateY(4px); box-shadow: none; }
 .boton svg, button svg { width: 1.4rem; height: 1.4rem; flex: none; }
 button.secundario, .boton.secundario {
-  color: var(--verde-hondo);
-  background: transparent;
-  border: 2px solid var(--verde);
+  color: var(--azul);
+  background: var(--blanco);
+  border-color: var(--azul);
+  box-shadow: 0 4px 0 var(--azul);
 }
-button.secundario:hover, .boton.secundario:hover { background: var(--verde-suave); }
+button.secundario:hover, .boton.secundario:hover { color: var(--azul-hondo); background: var(--azul-suave); }
 
-label { display: block; margin-top: 1.2rem; font-weight: 700; }
+label { display: block; margin-top: 1.3rem; font-weight: 700; }
 input, select, textarea {
   display: block;
   width: 100%;
   margin-top: .35rem;
-  padding: .7rem .8rem;
+  padding: .65rem .75rem;
   font: inherit;
   color: var(--tinta);
-  background: #fff;
+  background: var(--blanco);
   border: 2px solid var(--borde-campo);
-  border-radius: 10px;
+  border-radius: 0;
 }
 textarea { resize: vertical; }
-[aria-invalid="true"] { border-color: var(--ladrillo); }
-.error { color: var(--ladrillo); font-weight: 700; margin: .35rem 0 0; }
+[aria-invalid="true"] { border: 4px solid var(--rojo); }
+.error { color: var(--rojo); font-weight: 700; margin: .35rem 0 0; }
 .aviso {
   margin: 1rem 0;
   padding: .9rem 1rem;
   font-weight: 700;
-  background: var(--ladrillo-suave);
-  border-left: 6px solid var(--ladrillo);
-  border-radius: 8px;
+  background: var(--blanco);
+  border: 4px solid var(--rojo);
 }
 .vacio { color: var(--gris); }
 
 /* Prerregistro */
-fieldset { border: 0; padding: 0; margin: 1.4rem 0 0; }
+fieldset { border: 0; padding: 0; margin: 1.5rem 0 0; }
 legend { font-weight: 700; padding: 0; }
 .opciones { display: grid; gap: .55rem; margin-top: .5rem; }
 .opcion {
@@ -149,31 +179,35 @@ legend { font-weight: 700; padding: 0; }
   align-items: center;
   gap: .8rem;
   margin: 0;
-  padding: .8rem 1rem;
+  padding: .75rem .9rem;
   font-weight: 400;
-  background: #fff;
+  background: var(--blanco);
   border: 2px solid var(--borde);
-  border-radius: 12px;
+  border-radius: 4px;
   cursor: pointer;
 }
-.opcion:has(input:checked) { border-color: var(--verde); background: var(--verde-suave); font-weight: 700; }
-.opcion input { width: 1.35rem; height: 1.35rem; margin: 0; flex: none; accent-color: var(--verde); }
+.opcion:has(input:checked) { border-color: var(--azul); background: var(--azul-suave); font-weight: 700; }
+.opcion input { width: 1.5rem; height: 1.5rem; margin: 0; flex: none; accent-color: var(--azul); }
 .autoriza { margin-top: 1.6rem; }
-.autoriza .opcion { align-items: flex-start; border-color: var(--borde); background: var(--hoja); }
-.autoriza .opcion input { margin-top: .2rem; }
+.autoriza .opcion { align-items: flex-start; }
+.autoriza .opcion input { margin-top: .15rem; }
 @media (min-width: 30rem) { .opciones { grid-template-columns: 1fr 1fr; } }
 
-.listo { display: grid; place-items: center; width: 4rem; height: 4rem; margin: .4rem 0 .8rem; border-radius: 50%; color: #fff; background: var(--verde); }
-.listo svg { width: 2.2rem; height: 2.2rem; }
-.codigo {
-  margin: .8rem 0;
-  padding: .7rem .5rem;
+.listo {
+  margin: 0 0 1.2rem;
+  padding: 1.4rem 1.2rem;
+  color: var(--blanco);
+  background: var(--verde);
+  border-radius: 4px;
+  text-align: center;
+}
+.listo h1 { margin: 0 0 .4rem; color: var(--blanco); }
+.listo p { margin: 0; font-size: 1.2rem; }
+.listo .codigo {
+  margin: .5rem 0 0;
   font-size: 3.2rem;
   font-weight: 800;
-  letter-spacing: .35em;
-  text-indent: .35em;
-  text-align: center;
-  background: var(--hoja);
-  border: 2px dashed var(--verde);
-  border-radius: 16px;
+  line-height: 1.1;
+  letter-spacing: .3em;
+  text-indent: .3em;
 }

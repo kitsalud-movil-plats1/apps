@@ -5,7 +5,7 @@ Vista del personal clínico para los prerregistros que la gente llena en `https:
 | Archivo | Qué es |
 |---|---|
 | [`app.py`](app.py) | App en Flask. `GET /entrar` y `POST /entrar` (login), `GET /` (lista y búsqueda), `POST /atendido/<id>` (marcar o deshacer), `POST /salir` y `GET /salud`, que responde `ok` sin tocar la base ni AD |
-| [`templates/`](templates/) y [`static/estilo.css`](static/estilo.css) | Páginas en español, sin JavaScript ni recursos externos. En pantalla ancha cada prerregistro es una fila, y en celular una tarjeta |
+| [`templates/`](templates/) y [`static/estilo.css`](static/estilo.css) | Páginas en español, sin JavaScript ni recursos externos. En pantalla ancha cada prerregistro es una fila, y en celular una tarjeta. Usa la apariencia común de las páginas del kit (la misma base de `estilo.css` en el portal, el prerregistro, la consulta y la página de la CA), con Literata para los títulos y Atkinson Hyperlegible Next para el texto, incluidas en `fuentes/` con su licencia OFL para que se vean sin Internet. Los íconos son SVG dentro de la página |
 | [`Dockerfile`](Dockerfile) | `python:3.12.14-slim-bookworm` con usuario sin privilegios (`10001`) y gunicorn con 2 workers, `--preload` y sin socket de control |
 | [`requirements.txt`](requirements.txt) | Flask 3.1.3, gunicorn 26.2.0, psycopg 3.3.6 y ldap3 2.9.1 |
 | [`compose.yml`](compose.yml) | Imagen `kitsalud/consultas:1` construida en la VM, con la red del host y escuchando solo en `127.0.0.1:8200`. Sistema de archivos de solo lectura, límite de 256 MB, healthcheck, la raíz del kit montada en `/certs/raiz.crt` y el log por journald con la etiqueta `consultas` |

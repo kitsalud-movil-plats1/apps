@@ -6,6 +6,7 @@ así que nunca muestra ni guarda en comunidad01 lo que otras personas
 registraron. A cada prerregistro le da un código corto para que el personal
 la llame por él.
 """
+import mimetypes
 import os
 import re
 import secrets
@@ -13,6 +14,9 @@ from datetime import date
 
 import psycopg
 from flask import Flask, render_template, request
+
+# La imagen de Python no trae el tipo de las fuentes del diseño
+mimetypes.add_type("font/woff2", ".woff2")
 
 app = Flask(__name__)
 

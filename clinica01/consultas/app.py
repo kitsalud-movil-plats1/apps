@@ -8,6 +8,7 @@ atendido_en.
 """
 import hmac
 import logging
+import mimetypes
 import os
 import re
 import secrets
@@ -22,6 +23,9 @@ from ldap3.core.exceptions import LDAPException
 from ldap3.utils.conv import escape_filter_chars
 from psycopg.rows import dict_row
 from werkzeug.middleware.proxy_fix import ProxyFix
+
+# La imagen de Python no trae el tipo de las fuentes del diseño
+mimetypes.add_type("font/woff2", ".woff2")
 
 app = Flask(__name__)
 # Solo Caddy (127.0.0.1) llega a la app; de él salen la IP y el esquema del cliente

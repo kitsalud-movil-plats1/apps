@@ -1,20 +1,12 @@
 /* Apariencia común de las páginas del kit (portal, prerregistro, consulta y
-   certificado). La paleta y los patrones (foco amarillo, botón con sombra,
-   bordes de campo oscuros, fondo gris claro) siguen el sistema de diseño del
-   servicio de salud del Reino Unido (service-manual.nhs.uk), pensado para
-   personas de todas las edades y niveles de lectura, con contraste AA. Las
-   fuentes van junto a este archivo, en fuentes/, para que todo se vea igual sin
-   Internet. Licencia SIL OFL 1.1 en fuentes/OFL.txt */
+   certificado). La paleta sigue el sistema de diseño del servicio de salud del
+   Reino Unido (service-manual.nhs.uk), con contraste AA. La fuente va junto a
+   este archivo, en fuentes/, para que todo se vea igual sin Internet. Licencia
+   SIL OFL 1.1 en fuentes/OFL.txt */
 @font-face {
   font-family: "Atkinson Hyperlegible Next";
   src: url("fuentes/atkinson-hyperlegible-next.woff2") format("woff2");
   font-weight: 200 800;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Literata";
-  src: url("fuentes/literata.woff2") format("woff2");
-  font-weight: 200 900;
   font-display: swap;
 }
 
@@ -23,18 +15,19 @@
   --gris: #4c6272;
   --azul: #005eb8;
   --azul-hondo: #003087;
-  --azul-suave: #e8f1fa;
+  --azul-suave: #e6f0fa;
   --verde: #007f3b;
-  --verde-hondo: #00401e;
+  --verde-hondo: #006230;
+  --verde-suave: #e5f3eb;
   --fondo: #f0f4f5;
   --blanco: #ffffff;
   --borde: #d8dde0;
-  --borde-campo: #4c6272;
+  --borde-campo: #8b9aa5;
   --rojo: #d5281b;
-  --rojo-suave: #fbe9e7;
+  --rojo-suave: #fdecea;
   --foco: #ffeb3b;
-  --fuente: "Atkinson Hyperlegible Next", sans-serif;
-  --fuente-titulo: "Literata", Georgia, serif;
+  --sombra: 0 1px 2px rgba(33, 43, 50, .06), 0 8px 24px rgba(33, 43, 50, .08);
+  --fuente: "Atkinson Hyperlegible Next", system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -46,73 +39,68 @@ body {
   line-height: 1.55;
   color: var(--tinta);
   background: var(--fondo);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Encabezado en degradado; el contenido se monta encima en un panel */
 .barra {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: .6rem 1rem;
-  padding: .85rem 1.1rem;
+  padding: 1rem 1.25rem 4.5rem;
   color: var(--blanco);
-  background: var(--azul);
+  background: linear-gradient(135deg, #0072ce 0%, var(--azul) 45%, var(--azul-hondo) 100%);
 }
 .marca {
   display: flex;
   align-items: center;
   gap: .65rem;
   margin: 0;
-  font-family: var(--fuente-titulo);
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
   color: inherit;
   text-decoration: none;
 }
-.marca svg { width: 2rem; height: 2rem; flex: none; }
+.marca svg { width: 2.1rem; height: 2.1rem; flex: none; }
 
-main { max-width: 36rem; margin: 0 auto; padding: 1.8rem 1.1rem 3.5rem; }
-
-h1, h2 { font-family: var(--fuente-titulo); color: var(--tinta); line-height: 1.2; }
-h1 { font-size: 2rem; font-weight: 700; margin: .1rem 0 .8rem; letter-spacing: -.01em; }
-h2 { font-size: 1.35rem; font-weight: 700; margin: 2.2rem 0 .6rem; }
-p { margin: .6rem 0; }
-.entrada { font-size: 1.2rem; }
-.nota { color: var(--gris); font-size: 1rem; }
-a { color: var(--azul); text-decoration-thickness: 1px; text-underline-offset: .18em; }
-a:hover { color: var(--azul-hondo); text-decoration-thickness: 3px; }
-
-/* Foco visible y fuerte: fondo amarillo y línea negra debajo */
-a:focus-visible {
-  outline: 4px solid transparent;
-  color: var(--tinta);
-  background: var(--foco);
-  box-shadow: 0 -2px var(--foco), 0 4px var(--tinta);
-  text-decoration: none;
+main { max-width: 38rem; margin: -3.4rem auto 0; padding: 0 1rem 3.5rem; }
+.panel {
+  padding: 1.6rem 1.35rem 1.8rem;
+  background: var(--blanco);
+  border-radius: 20px;
+  box-shadow: var(--sombra);
 }
-button:focus-visible, .boton:focus-visible {
-  outline: 4px solid transparent;
-  color: var(--tinta);
-  background: var(--foco);
-  box-shadow: 0 4px 0 var(--tinta);
+
+h1, h2 { color: var(--tinta); line-height: 1.15; letter-spacing: -.025em; }
+h1 { font-size: 2.05rem; font-weight: 800; margin: 0 0 .7rem; }
+h2 { font-size: 1.35rem; font-weight: 800; margin: 2rem 0 .6rem; }
+p { margin: .6rem 0; }
+.entrada { font-size: 1.2rem; color: var(--gris); }
+.nota { color: var(--gris); font-size: 1rem; }
+a { color: var(--azul); font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+a:hover { color: var(--azul-hondo); text-decoration-thickness: 2px; }
+
+/* Foco visible: anillo amarillo y borde oscuro */
+a:focus-visible, button:focus-visible, .boton:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 7px var(--foco);
 }
 input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 4px solid var(--foco);
-  outline-offset: 0;
-  box-shadow: inset 0 0 0 2px var(--tinta);
+  outline: none;
+  border-color: var(--tinta);
+  box-shadow: 0 0 0 4px var(--foco);
 }
 
 .hoja {
   margin: 1rem 0;
-  padding: 1.1rem 1.2rem;
+  padding: 1.2rem 1.3rem;
   background: var(--blanco);
-  border: 1px solid var(--borde);
-  border-radius: 4px;
-}
-.destacado {
-  margin: 1.2rem 0;
-  padding: .3rem 0 .3rem 1.1rem;
-  border-left: 8px solid var(--azul);
+  border-radius: 16px;
+  box-shadow: var(--sombra);
 }
 
 button, .boton {
@@ -121,58 +109,61 @@ button, .boton {
   justify-content: center;
   gap: .6rem;
   width: 100%;
-  min-height: 3.3rem;
-  margin: 1.5rem 0 .3rem;
-  padding: .8rem 1.2rem;
+  min-height: 3.4rem;
+  margin: 1.5rem 0 0;
+  padding: .85rem 1.3rem;
   font: inherit;
   font-weight: 700;
   font-size: 1.15rem;
   color: var(--blanco);
   background: var(--verde);
   border: 2px solid transparent;
-  border-radius: 4px;
-  box-shadow: 0 4px 0 var(--verde-hondo);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(0, 64, 30, .2), 0 6px 16px rgba(0, 127, 59, .25);
   text-decoration: none;
   cursor: pointer;
+  transition: background .15s, transform .1s;
 }
-button:hover, .boton:hover { color: var(--blanco); background: #00662f; }
-button:active, .boton:active { transform: translateY(4px); box-shadow: none; }
-.boton svg, button svg { width: 1.4rem; height: 1.4rem; flex: none; }
+button:hover, .boton:hover { color: var(--blanco); background: var(--verde-hondo); }
+button:active, .boton:active { transform: scale(.98); }
+.boton svg, button svg { width: 1.35rem; height: 1.35rem; flex: none; }
 button.secundario, .boton.secundario {
   color: var(--azul);
   background: var(--blanco);
-  border-color: var(--azul);
-  box-shadow: 0 4px 0 var(--azul);
+  border-color: var(--borde);
+  box-shadow: none;
 }
-button.secundario:hover, .boton.secundario:hover { color: var(--azul-hondo); background: var(--azul-suave); }
+button.secundario:hover, .boton.secundario:hover { color: var(--azul-hondo); background: var(--azul-suave); border-color: var(--azul); }
 
 label { display: block; margin-top: 1.3rem; font-weight: 700; }
 input, select, textarea {
   display: block;
   width: 100%;
-  margin-top: .35rem;
-  padding: .65rem .75rem;
+  margin-top: .4rem;
+  padding: .75rem .9rem;
   font: inherit;
   color: var(--tinta);
   background: var(--blanco);
   border: 2px solid var(--borde-campo);
-  border-radius: 0;
+  border-radius: 12px;
+  transition: border-color .15s, box-shadow .15s;
 }
 textarea { resize: vertical; }
-[aria-invalid="true"] { border: 4px solid var(--rojo); }
-.error { color: var(--rojo); font-weight: 700; margin: .35rem 0 0; }
+[aria-invalid="true"] { border-color: var(--rojo); background: var(--rojo-suave); }
+.error { display: flex; gap: .4rem; color: var(--rojo); font-weight: 700; margin: .4rem 0 0; }
 .aviso {
-  margin: 1rem 0;
-  padding: .9rem 1rem;
+  margin: 1.2rem 0;
+  padding: .95rem 1.1rem;
   font-weight: 700;
-  background: var(--blanco);
-  border: 4px solid var(--rojo);
+  color: #8a1a11;
+  background: var(--rojo-suave);
+  border-radius: 12px;
 }
 .vacio { color: var(--gris); }
 
 /* Certificado del kit */
-main { max-width: 42rem; }
+main { max-width: 44rem; }
 .pasos { margin: .4rem 0 0; padding-left: 1.4rem; }
 .pasos li { margin: .5rem 0; padding-left: .2rem; }
-code { padding: .05rem .35rem; font-size: .95em; background: var(--fondo); border: 1px solid var(--borde); overflow-wrap: anywhere; }
+code { padding: .1rem .4rem; font-size: .95em; background: var(--fondo); border-radius: 6px; overflow-wrap: anywhere; }
 .hoja h2 { margin-top: 0; }

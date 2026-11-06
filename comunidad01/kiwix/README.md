@@ -1,6 +1,6 @@
 # Biblioteca Kiwix en comunidad01
 
-Portal de literatura para la sala de espera (R7, D-08, sección 10.5). `kiwix-serve` publica una biblioteca médica en español, una enciclopedia para niños y simulaciones educativas, sin Internet. Caddy la publica como `http://biblioteca.salud.movil` ([`../caddy/`](../caddy/)).
+Portal de literatura para la sala de espera. `kiwix-serve` publica una biblioteca médica en español, una enciclopedia para niños y simulaciones educativas, sin Internet. Caddy la publica como `http://biblioteca.salud.movil` ([`../caddy/`](../caddy/)).
 
 | Archivo | Qué es |
 |---|---|
@@ -28,7 +28,7 @@ ansible-playbook playbooks/comunidad01.yml                         # Docker, Kiw
 ansible-playbook playbooks/comunidad01.yml -e kiwix_estado=stopped # docker compose down; los ZIM quedan
 ```
 
-- **ZIM.** El rol no descarga ni borra ZIM. Llegan con la publicación (`playbooks/publicacion.yml`), que también borra los que se quitan de `contenido/zim`. Para cambiar un libro de la lista se edita `contenido.yml` con el archivo y el sha256 nuevos (el sha256 está en `<url del ZIM>.sha256`) y se ejecuta `playbooks/publicacion.yml`. Se descarga en base, nunca en campo (R-05).
+- **ZIM.** El rol no descarga ni borra ZIM. Llegan con la publicación (`playbooks/publicacion.yml`), que también borra los que se quitan de `contenido/zim`. Para cambiar un libro de la lista se edita `contenido.yml` con el archivo y el sha256 nuevos (el sha256 está en `<url del ZIM>.sha256`) y se ejecuta `playbooks/publicacion.yml`. Se descarga en base, nunca en campo.
 - **Carpeta de los ZIM.** El rol crea `/srv/medios/zim` sin fijar el dueño. Es del usuario `publicacion`, que le asigna el rol `publicacion_destino`.
 - **Reinicio.** `kiwix-recarga.path` queda activo con `kiwix_estado=started` y se apaga con `stopped`, para no levantar Kiwix detenido. La espera se cambia con `kiwix_recarga_espera` (30 s).
 

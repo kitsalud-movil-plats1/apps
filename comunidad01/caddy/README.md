@@ -1,6 +1,6 @@
 # Caddy en comunidad01
 
-Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por nombre y la raíz de la CA del kit. Publica el registro por HTTPS, firmado por el intermedio de comunidad01 ([`platform/kit01/ca/`](../../../platform/kit01/ca/README.md)).
+Proxy inverso de comunidad01. Publica el contenido de la comunidad por nombre y la raíz de la CA del kit. Publica el registro por HTTPS, firmado por el intermedio de comunidad01 ([`platform/kit01/ca/`](../../../platform/kit01/ca/README.md)).
 
 | Archivo | Qué es |
 |---|---|
@@ -19,7 +19,7 @@ Caddy usa la red del host para escuchar en IPv4 e IPv6 y ver la IP real del clie
 
 ## Cómo se despliega
 
-Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible-playbook playbooks/comunidad01.yml`). El rol toma los archivos de `apps/<vm>/caddy/`, deja todo en `/srv/caddy/` (`compose.yml`, `conf/Caddyfile`, `data/` y `config/`), recarga Caddy cuando cambia el Caddyfile y abre en ufw `caddy_puertos` desde `caddy_origenes` (`inventarios/kit/host_vars/comunidad01.yml`). En comunidad01 son el 80 y el 443 desde la Interna y la Comunidad, en las dos familias. En kit01 la Interna llega por F-07 y la Comunidad llegará por F-09 cuando el portal la autorice (network#8).
+Con el rol `caddy` de `apps/ansible/roles/`, desde `platform/ansible/` (`ansible-playbook playbooks/comunidad01.yml`). El rol toma los archivos de `apps/<vm>/caddy/`, deja todo en `/srv/caddy/` (`compose.yml`, `conf/Caddyfile`, `data/` y `config/`), recarga Caddy cuando cambia el Caddyfile y abre en ufw `caddy_puertos` desde `caddy_origenes` (`inventarios/kit/host_vars/comunidad01.yml`). En comunidad01 son el 80 y el 443 desde la Interna y la Comunidad, en las dos familias. El firewall de kit01 deja pasar a la Interna, y a la Comunidad cuando acepta el portal.
 
 ## Cómo se verifica
 

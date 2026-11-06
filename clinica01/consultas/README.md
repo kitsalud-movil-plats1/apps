@@ -1,6 +1,6 @@
 # Consulta de prerregistros en clinica01
 
-Vista del personal clínico para los prerregistros que la gente llena en `https://registro.salud.movil` (R8, D-07). Se entra con el usuario de Samba AD y solo pasa el grupo `clinicos` (R10). Muestra quién está por atender, con su código de turno, y deja marcar a cada persona como atendida. Caddy la publica en `https://consultas.salud.movil` ([`../caddy/`](../caddy/)), al que llega solo la Interna (F-05).
+Vista del personal clínico para los prerregistros que la gente llena en `https://registro.salud.movil`. Se entra con el usuario de Samba AD y solo pasa el grupo `clinicos`. Muestra quién está por atender, con su código de turno, y deja marcar a cada persona como atendida. Caddy la publica en `https://consultas.salud.movil` ([`../caddy/`](../caddy/)), al que llega solo la Interna.
 
 | Archivo | Qué es |
 |---|---|
@@ -14,7 +14,7 @@ Vista del personal clínico para los prerregistros que la gente llena en `https:
 ## Cómo entra el personal
 
 1. La persona escribe su usuario (`ana.rojas`, o `ana.rojas@ad.salud.movil`) y su contraseña del dominio.
-2. La app hace *bind* por LDAPS en `dc01.ad.salud.movil:636` con `usuario@ad.salud.movil` y esa contraseña, igual que Grafana, sin cuenta de servicio. Verifica el certificado del DC con la raíz del kit, que es la que firmó el intermedio de clinica01 (D-16).
+2. La app hace *bind* por LDAPS en `dc01.ad.salud.movil:636` con `usuario@ad.salud.movil` y esa contraseña, igual que Grafana, sin cuenta de servicio. Verifica el certificado del DC con la raíz del kit, que es la que firmó el intermedio de clinica01.
 3. Busca al usuario por `sAMAccountName` y lo deja entrar solo si su `memberOf` incluye `CN=clinicos,CN=Users,DC=ad,DC=salud,DC=movil`.
 
 | Caso | Respuesta |
@@ -43,7 +43,7 @@ La app se conecta a `10.20.20.11,fd5a:fc7e:d716:20::11` (libpq prueba la IPv4 y 
 
 ## Registro de accesos
 
-Cada entrada, salida, rechazo y cambio de estado queda en journald con la etiqueta `consultas`, y rsyslog lo reenvía a kit01 (F-15). Ahí se ve en `/var/log/kitsalud/clinica01/syslog.log`.
+Cada entrada, salida, rechazo y cambio de estado queda en journald con la etiqueta `consultas`, y rsyslog lo reenvía a kit01. Ahí se ve en `/var/log/kitsalud/clinica01/syslog.log`.
 
 ```
 consultas[937]: Entrada: ana.rojas desde 10.20.10.50
@@ -61,7 +61,7 @@ Desde `platform/ansible/`, con el rol `consultas` de `apps/ansible/roles/`. El u
 ansible-playbook playbooks/clinica01.yml    # base, usuario consultas, la app y Caddy
 ```
 
-El rol copia el código a `/srv/consultas/`, genera `.env` y ejecuta `docker compose up -d --build` si cambió el código o el `.env`. La imagen se construye en la VM, así que la primera vez y cada vez que cambia `requirements.txt` necesita salida a Internet por F-17 (en base, R-05). La clave de `consultas` está en el vault (`vault_consultas_db_password`).
+El rol copia el código a `/srv/consultas/`, genera `.env` y ejecuta `docker compose up -d --build` si cambió el código o el `.env`. La imagen se construye en la VM, así que la primera vez y cada vez que cambia `requirements.txt` necesita salida a Internet (en la base). La clave de `consultas` está en el vault (`vault_consultas_db_password`).
 
 ## Cómo se ve desde la máquina propia
 
@@ -84,7 +84,7 @@ echo '127.0.0.1 consultas.salud.movil' | sudo tee -a /etc/hosts
 | Un `POST` sin token | `302` a `/entrar?vencida=1` |
 | En kit01, `grep consultas /var/log/kitsalud/clinica01/syslog.log` | Las entradas, rechazos y cambios con usuario e IP |
 | Desde la Interna (sw01), `/tool fetch url="http://10.20.20.11:443/" keep-result=no` y con `[fd5a:fc7e:d716:20::11]` | `status 400`. Caddy contestó, así que el firewall deja pasar el 443 |
-| Desde la Comunidad (`prueba01`), `curl -4` y `curl -6 https://consultas.salud.movil/` | *Timeout* y un `fw-drop` en `/var/log/kitsalud/kit01/firewall.log` (F-20) |
+| Desde la Comunidad (`prueba01`), `curl -4` y `curl -6 https://consultas.salud.movil/` | *Timeout* y un `fw-drop` en `/var/log/kitsalud/kit01/firewall.log` |
 | En Grafana, **Estado del kit** | "Consulta de prerregistros" en verde; con el contenedor detenido, en rojo y la alerta `ServicioCaido` |
 
 ## Diagnóstico

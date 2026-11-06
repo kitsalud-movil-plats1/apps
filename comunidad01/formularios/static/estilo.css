@@ -1,20 +1,196 @@
-:root { --verde: #0b6e4f; --rojo: #b00020; --texto: #1d2733; --fondo: #ffffff; --suave: #eef2f5; }
+/* Apariencia común de las páginas del kit (portal, prerregistro, consulta y
+   certificado). Fondo lavanda, una tarjeta blanca como pantalla, ilustraciones
+   de línea, campos en forma de píldora y botones con contorno. La fuente va
+   junto a este archivo, en fuentes/, para que todo se vea igual sin Internet.
+   Licencia SIL OFL 1.1 en fuentes/OFL.txt */
+@font-face {
+  font-family: "Lexend";
+  src: url("fuentes/lexend.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --tinta: #1b1a55;
+  --gris: #55577a;
+  --lila: #7a7fd1;
+  --lila-hondo: #464bb0;
+  --lavanda: #b3bcea;
+  --pildora: #f1f1f8;
+  --blanco: #ffffff;
+  --rojo: #b3261e;
+  --rojo-suave: #fcecea;
+  --ancho: 30rem;
+  --fuente: "Lexend", sans-serif;
+}
+
 * { box-sizing: border-box; }
-body { margin: 0; font-family: system-ui, sans-serif; font-size: 1.1rem; line-height: 1.5; color: var(--texto); background: var(--fondo); }
-header { background: var(--verde); color: #fff; padding: .6rem 1rem; }
-.marca { margin: 0; font-weight: 700; }
-main { max-width: 36rem; margin: 0 auto; padding: 1rem; }
-h1 { font-size: 1.4rem; }
-label { display: block; margin-top: 1rem; font-weight: 600; }
-.nota { font-weight: 400; color: #4a5866; }
-input, select, textarea { width: 100%; font: inherit; padding: .6rem; border: 2px solid #8a97a3; border-radius: .4rem; margin-top: .3rem; background: #fff; }
-input[aria-invalid="true"] { border-color: var(--rojo); }
-fieldset { border: 0; padding: 0; margin: 1.2rem 0 0; }
-legend { font-weight: 600; }
-.opcion { font-weight: 400; display: flex; gap: .6rem; align-items: flex-start; margin-top: .5rem; }
-.opcion input { width: auto; margin-top: .35rem; transform: scale(1.3); }
-.autoriza { background: var(--suave); padding: .2rem .8rem .8rem; border-radius: .4rem; margin-top: 1.2rem; }
-.error { color: var(--rojo); margin: .3rem 0 0; font-weight: 600; }
-.aviso { background: #fde8e8; border-left: 6px solid var(--rojo); padding: .8rem; border-radius: .3rem; font-weight: 600; }
-button, .boton { display: block; width: 100%; text-align: center; margin-top: 1.5rem; padding: .9rem; font: inherit; font-weight: 700; color: #fff; background: var(--verde); border: 0; border-radius: .5rem; text-decoration: none; }
-.codigo { font-size: 3rem; font-weight: 800; letter-spacing: .4rem; text-align: center; background: var(--suave); border-radius: .5rem; padding: .5rem; margin: .5rem 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  font-size: 1.0625rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--tinta);
+  background: var(--lavanda) url("fondo.svg") center / cover fixed no-repeat;
+}
+
+/* La barra y el contenido forman una sola tarjeta blanca */
+.barra, main {
+  width: min(calc(100% - 1.5rem), var(--ancho));
+  margin-inline: auto;
+  background: var(--blanco);
+}
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+  padding: 1.1rem 1.6rem .3rem;
+  border-radius: 10px 10px 0 0;
+}
+main {
+  margin-bottom: 2.5rem;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 24px 48px rgba(70, 75, 176, .28);
+}
+.panel { padding: 1rem 1.6rem 2.2rem; }
+.marca {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--gris);
+  text-decoration: none;
+}
+.marca svg { width: 1.5rem; height: 1.5rem; flex: none; }
+
+h1, h2 { color: var(--tinta); line-height: 1.15; }
+h1 { font-size: 2.3rem; font-weight: 600; letter-spacing: -.02em; margin: .6rem 0 1rem; }
+h1 .saludo { display: block; font-size: .78em; font-weight: 300; letter-spacing: -.01em; }
+h2 { font-size: 1.2rem; font-weight: 600; margin: 1.8rem 0 .7rem; }
+p { margin: .6rem 0; }
+.entrada { color: var(--gris); text-align: center; }
+.nota { color: var(--gris); font-size: .95rem; }
+.ilustracion { display: block; width: min(100%, 15rem); height: auto; margin: 1.1rem auto; }
+a { color: var(--lila-hondo); font-weight: 500; text-underline-offset: .2em; }
+a:hover { color: var(--tinta); }
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 2px;
+}
+
+.hoja { margin: 1rem 0; padding: 1.1rem 1.3rem; background: var(--pildora); border-radius: 22px; }
+
+/* Botón con contorno, como una píldora */
+button, .boton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  width: fit-content;
+  min-width: 11rem;
+  min-height: 3.2rem;
+  margin: 1.8rem auto 0;
+  padding: .6rem 2rem;
+  font: inherit;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--tinta);
+  background: var(--blanco);
+  border: 2px solid var(--tinta);
+  border-radius: 999px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+button:hover, .boton:hover { color: var(--blanco); background: var(--tinta); }
+.boton svg, button svg { width: 1.3rem; height: 1.3rem; flex: none; }
+button.secundario, .boton.secundario { font-size: 1rem; border-color: var(--lila); }
+button.secundario:hover, .boton.secundario:hover { color: var(--tinta); background: var(--pildora); }
+
+label { display: block; margin-top: 1.2rem; font-weight: 500; }
+input, select, textarea {
+  display: block;
+  width: 100%;
+  margin-top: .35rem;
+  padding: .7rem 1.2rem;
+  font: inherit;
+  font-weight: 400;
+  color: var(--tinta);
+  background: var(--pildora);
+  border: 1.5px solid var(--lila);
+  border-radius: 999px;
+}
+textarea { border-radius: 22px; resize: vertical; }
+[aria-invalid="true"] { border: 2px solid var(--rojo); background: var(--rojo-suave); }
+.error { color: var(--rojo); font-weight: 500; margin: .35rem 0 0 1.2rem; }
+.aviso {
+  margin: 1.1rem 0;
+  padding: .85rem 1.2rem;
+  font-weight: 500;
+  color: var(--rojo);
+  background: var(--rojo-suave);
+  border-radius: 22px;
+}
+.vacio { color: var(--gris); }
+
+/* Prerregistro */
+fieldset { border: 0; padding: 0; margin: 1.4rem 0 0; }
+legend { font-weight: 500; padding: 0; }
+.opciones { display: grid; gap: .55rem; margin-top: .5rem; }
+
+/* Fila en píldora con su círculo a la derecha */
+.opcion {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  margin: 0;
+  padding: .6rem .7rem .6rem 1.3rem;
+  font-weight: 400;
+  background: var(--pildora);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.opcion input {
+  appearance: none;
+  flex: none;
+  width: 1.7rem;
+  height: 1.7rem;
+  margin: 0;
+  padding: 0;
+  background: var(--blanco);
+  border: 1.5px solid var(--lila-hondo);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.opcion input:checked { background: var(--lila-hondo); box-shadow: inset 0 0 0 4px var(--blanco); }
+.opcion:has(input:checked) { font-weight: 600; }
+.autoriza { margin-top: 1.5rem; }
+.autoriza .opcion { align-items: flex-start; padding: .9rem .9rem .9rem 1.3rem; font-size: .95rem; line-height: 1.45; border-radius: 22px; }
+
+.codigo {
+  margin: .6rem 0 1rem;
+  padding: .55rem .5rem;
+  font-size: 2.9rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: .28em;
+  text-indent: .28em;
+  text-align: center;
+  background: var(--pildora);
+  border: 1.5px solid var(--lila);
+  border-radius: 999px;
+}
+.centro { text-align: center; }

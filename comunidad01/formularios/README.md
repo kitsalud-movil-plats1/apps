@@ -5,7 +5,7 @@ Prerregistro mínimo y asistido para la sala de espera (R8, D-07). La persona ll
 | Archivo | Qué es |
 |---|---|
 | [`app.py`](app.py) | App en Flask. `GET /` muestra el formulario, `POST /` valida y guarda, `GET /salud` responde `ok` sin tocar la base |
-| [`templates/`](templates/) y [`static/estilo.css`](static/estilo.css) | Páginas en lenguaje simple, sin JavaScript ni recursos externos, con botones grandes |
+| [`templates/`](templates/) y [`static/estilo.css`](static/estilo.css) | Páginas en lenguaje simple, sin JavaScript ni recursos externos, con botones grandes y las opciones del motivo como tarjetas que se tocan. Usa la apariencia común de las páginas del kit (la misma base de `estilo.css` en el portal, el prerregistro, la consulta y la página de la CA), con fondo lavanda, una tarjeta blanca, campos en forma de píldora y botones con contorno. La fuente Lexend está en `fuentes/` con su licencia OFL y las ilustraciones de línea en `ilustraciones/`, para que todo se vea sin Internet |
 | [`Dockerfile`](Dockerfile) | `python:3.12.14-slim-bookworm` con usuario sin privilegios (`10001`) y gunicorn con 2 workers |
 | [`requirements.txt`](requirements.txt) | Flask 3.1.3, gunicorn 26.2.0 y psycopg 3.3.6 |
 | [`compose.yml`](compose.yml) | Imagen `kitsalud/formularios:1` construida en la VM, solo en `127.0.0.1:8100`, sistema de archivos de solo lectura, límite de 256 MB y healthcheck |
@@ -16,8 +16,8 @@ Prerregistro mínimo y asistido para la sala de espera (R8, D-07). La persona ll
 | Campo | Obligatorio | Validación |
 |---|---|---|
 | Nombres y apellidos | Sí | Hasta 80 caracteres cada uno |
-| Tipo de documento | Sí | CC, TI, RC, CE, otro o "no tengo documento" |
-| Número de documento | Si tiene documento | Letras, números y guiones, de 3 a 20 |
+| Tipo de documento | Sí | CC, TI, RC, CE u otro |
+| Número de documento | Sí | Letras, números y guiones, de 3 a 20. El personal busca a la persona por él |
 | Fecha de nacimiento | No | Entre 1900 y hoy |
 | Celular | No | De 7 a 15 dígitos |
 | Motivo | Sí | Control, fiebre o malestar, dolor, embarazo, vacunación u otro |

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block titulo %}Registro recibido{% endblock %}
 {% block contenido %}
-<h1>¡Listo, {{ nombres }}!</h1>
-<p>Recibimos sus datos. Su código es</p>
+<h1><span class="saludo">Listo,</span> {{ nombres }}</h1>
+<img class="ilustracion" src="{{ url_for('static', filename='ilustraciones/espera.svg') }}" alt="">
+<p class="centro">Recibimos sus datos. Su código es</p>
 <p class="codigo" aria-label="Código {{ codigo | join(' ') }}">{{ codigo }}</p>
-<p>Guarde este código o tómele una foto. El personal de salud lo va a llamar por él.</p>
-<p><a class="boton" href="/">Registrar a otra persona</a></p>
+<p class="centro nota">Guarde este código o tómele una foto. El personal de salud lo va a llamar por él.</p>
+<a class="boton secundario" href="/">Registrar a otra persona</a>
 {% endblock %}

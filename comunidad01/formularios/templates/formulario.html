@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% macro error(campo) %}{% if errores.get(campo) %}<p class="error" id="error-{{ campo }}">{{ errores[campo] }}</p>{% endif %}{% endmacro %}
 {% block contenido %}
-<h1>Prerregistro para la consulta</h1>
-<p>Llene estos datos mientras espera. Así el personal de salud lo atiende más rápido. Si necesita ayuda, pídala al personal.</p>
+<h1><span class="saludo">Prerregistro</span> para la consulta</h1>
+<img class="ilustracion" src="{{ url_for('static', filename='ilustraciones/formulario.svg') }}" alt="">
+<p class="entrada">Llene estos datos mientras espera. Así el personal de salud lo atiende más rápido. Si necesita ayuda, pídala al personal.</p>
 
 {% if aviso %}<p class="aviso" role="alert">{{ aviso }}</p>{% endif %}
 {% if errores %}<p class="aviso" role="alert">Revise los datos marcados en rojo.</p>{% endif %}
@@ -23,8 +24,8 @@
   </select>
   {{ error('tipo_documento') }}
 
-  <label for="numero_documento">Número de documento <span class="nota">(si no tiene, déjelo vacío)</span></label>
-  <input id="numero_documento" name="numero_documento" inputmode="numeric" maxlength="20" value="{{ datos.get('numero_documento', '') }}">
+  <label for="numero_documento">Número de documento</label>
+  <input id="numero_documento" name="numero_documento" inputmode="numeric" maxlength="20" required aria-required="true" value="{{ datos.get('numero_documento', '') }}" {% if errores.get('numero_documento') %}aria-invalid="true"{% endif %}>
   {{ error('numero_documento') }}
 
   <label for="fecha_nacimiento">Fecha de nacimiento <span class="nota">(opcional)</span></label>
@@ -37,9 +38,11 @@
 
   <fieldset>
     <legend>¿Por qué viene a la consulta?</legend>
+    <div class="opciones">
     {% for valor, texto in motivos %}
     <label class="opcion"><input type="radio" name="motivo" value="{{ valor }}" {% if datos.get('motivo') == valor %}checked{% endif %}> {{ texto }}</label>
     {% endfor %}
+    </div>
     {{ error('motivo') }}
   </fieldset>
 
@@ -53,6 +56,6 @@
     {{ error('autoriza_datos') }}
   </div>
 
-  <button type="submit">Enviar</button>
+  <button type="submit">Enviar prerregistro</button>
 </form>
 {% endblock %}

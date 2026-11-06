@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% macro tarjeta(p, accion) %}
-<article class="tarjeta">
+<article class="tarjeta{% if accion != 'marcar' %} atendido{% endif %}">
   <div class="cabeza">
     <p class="codigo">{{ p.codigo }}</p>
     <p class="hora">{% if p.atendido_en %}Atendido {{ p.atendido_en.strftime('%H:%M') }}{% else %}{{ p.creado.strftime('%d/%m %H:%M') }}{% endif %}</p>
@@ -30,20 +30,24 @@
   <label for="q">Buscar por código o número de documento</label>
   <div class="fila">
     <input id="q" name="q" maxlength="20" value="{{ busqueda }}" autocapitalize="characters">
-    <button type="submit">Buscar</button>
+    <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
   </div>
   {% if busqueda %}<p><a href="/">Ver todos</a></p>{% endif %}
 </form>
 
 {% if aviso %}<p class="aviso" role="alert">{{ aviso }}</p>{% endif %}
 
-<h1>Por atender ({{ pendientes | length }})</h1>
-<p><a href="{{ url_for('inicio', q=busqueda or None) }}">Actualizar la lista</a></p>
+<div class="encabezado">
+<h1>Por atender <span class="cuenta">{{ pendientes | length }}</span></h1>
+<a href="{{ url_for('inicio', q=busqueda or None) }}">Actualizar la lista</a>
+</div>
 {% for p in pendientes %}{{ tarjeta(p, 'marcar') }}{% else %}
 <p class="vacio">{% if busqueda %}No hay prerregistros pendientes con «{{ busqueda }}».{% else %}No hay prerregistros pendientes.{% endif %}</p>
 {% endfor %}
 
-<h2>Atendidos hoy ({{ atendidos | length }})</h2>
+<div class="encabezado">
+<h2>Atendidos hoy <span class="cuenta">{{ atendidos | length }}</span></h2>
+</div>
 {% for p in atendidos %}{{ tarjeta(p, 'deshacer') }}{% else %}
 <p class="vacio">Todavía no hay personas atendidas hoy.</p>
 {% endfor %}

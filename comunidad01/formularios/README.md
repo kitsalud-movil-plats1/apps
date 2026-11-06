@@ -1,6 +1,6 @@
 # Formularios de prerregistro en comunidad01
 
-Prerregistro mínimo y asistido para la sala de espera (R8, D-07). La persona llena unos pocos datos desde su celular, o el personal la ayuda, y recibe un código corto con el que la llaman. Los datos se guardan en PostgreSQL de clinica01 con un usuario que solo puede insertar, así que comunidad01 nunca guarda ni puede leer los prerregistros. Caddy lo publica en `https://registro.salud.movil` ([`../caddy/`](../caddy/)).
+Prerregistro mínimo y asistido para la sala de espera. La persona llena unos pocos datos desde su celular, o el personal la ayuda, y recibe un código corto con el que la llaman. Los datos se guardan en PostgreSQL de clinica01 con un usuario que solo puede insertar, así que comunidad01 nunca guarda ni puede leer los prerregistros. Caddy lo publica en `https://registro.salud.movil` ([`../caddy/`](../caddy/)).
 
 | Archivo | Qué es |
 |---|---|
@@ -24,7 +24,7 @@ Prerregistro mínimo y asistido para la sala de espera (R8, D-07). La persona ll
 | Detalle | No | Hasta 200 caracteres |
 | Autorización de datos | Sí | Texto breve según la Ley 1581 de 2012 |
 
-La tabla `prerregistros` de clinica01 repite estas reglas con `CHECK` ([`../../clinica01/dhis2/prerregistro.sql`](../../clinica01/dhis2/prerregistro.sql)) y tiene la columna `atendido`, que marca el personal desde la consulta (apps#7).
+La tabla `prerregistros` de clinica01 repite estas reglas con `CHECK` ([`../../clinica01/dhis2/prerregistro.sql`](../../clinica01/dhis2/prerregistro.sql)) y tiene la columna `atendido`, que marca el personal desde la consulta.
 
 **Código de turno.** Cuatro caracteres al azar de un alfabeto sin letras ni números que se confundan al decirlos (por ejemplo `R7P9`). La app lo genera, lo guarda en la fila y lo muestra; no necesita leer la base para eso.
 
@@ -39,7 +39,7 @@ ansible-playbook playbooks/clinica01.yml    # base prerregistro y usuario formul
 ansible-playbook playbooks/comunidad01.yml  # app, Caddy y el 443 en ufw
 ```
 
-El rol copia el código a `/srv/formularios/`, genera `.env` y ejecuta `docker compose up -d --build` si cambió el código o el `.env`. La imagen se construye en la VM, así que necesita salida a Internet por F-17 (en base, R-05) la primera vez y cada vez que cambia `requirements.txt`.
+El rol copia el código a `/srv/formularios/`, genera `.env` y ejecuta `docker compose up -d --build` si cambió el código o el `.env`. La imagen se construye en la VM, así que necesita salida a Internet (en la base) la primera vez y cada vez que cambia `requirements.txt`.
 
 ## Cómo se ve desde la máquina propia
 
@@ -59,11 +59,11 @@ echo '127.0.0.1 registro.salud.movil' | sudo tee -a /etc/hosts
 | Un `POST` vacío | `400` con un mensaje por cada campo que falta |
 | `sudo docker stop dhis2-db-1` en clinica01, un `POST`, `sudo docker start dhis2-db-1` y otro `POST` | `503` con el aviso y lo escrito conservado; después `200` sin reiniciar la app |
 | Desde la Interna, `curl -4` y `curl -6 --cacert raiz.crt https://registro.salud.movil/` | `200` |
-| Desde la Comunidad, el mismo `curl` | Bloqueado hasta que el portal autorice al cliente (F-09, network#8) |
+| Desde la Comunidad, el mismo `curl` | Bloqueado hasta que el portal autorice al cliente |
 
 ## Diagnóstico
 
 - **Siempre muestra el aviso de que no se pudo guardar.** `sudo docker logs formularios-app-1`. Si dice que PostgreSQL no responde, revisar desde comunidad01 `nc -zv clinica01.salud.movil 5432` y en clinica01 `pg_hba.conf` (`../../clinica01/dhis2/README.md`).
 - **`password authentication failed for user "formularios"`.** La clave del `.env` y la de la base no coinciden; se vuelven a alinear con los dos playbooks.
 - **`502` desde Caddy.** El contenedor no está arriba: `sudo docker compose -f /srv/formularios/compose.yml ps`.
-- **La construcción falla.** La VM no llega a PyPI o a Docker Hub (F-17).
+- **La construcción falla.** La VM no llega a PyPI o a Docker Hub.

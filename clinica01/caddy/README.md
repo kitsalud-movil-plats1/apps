@@ -1,6 +1,6 @@
 # Caddy en clinica01
 
-Proxy inverso de clinica01 (D-16). Todo lo de clinica01 maneja datos de pacientes o del personal, así que va por HTTPS con `tls internal`, firmado por el intermedio de clinica01 de la CA del kit ([`platform/kit01/ca/`](../../../platform/kit01/ca/README.md)).
+Proxy inverso de clinica01. Todo lo de clinica01 maneja datos de pacientes o del personal, así que va por HTTPS con `tls internal`, firmado por el intermedio de clinica01 de la CA del kit ([`platform/kit01/ca/`](../../../platform/kit01/ca/README.md)).
 
 | Archivo | Qué es |
 |---|---|
@@ -18,7 +18,7 @@ Proxy inverso de clinica01 (D-16). Todo lo de clinica01 maneja datos de paciente
 
 ## Cómo se despliega
 
-Con el rol `caddy` de `apps/ansible/roles/` desde `platform/ansible/` (`ansible-playbook playbooks/clinica01.yml`). El rol toma los archivos de `apps/<vm>/caddy/` y abre en ufw los puertos de `caddy_puertos` desde `caddy_origenes`, que en clinica01 son el 443 desde la Interna en las dos familias (`inventarios/kit/host_vars/clinica01.yml`, F-05). El 80 no se abre.
+Con el rol `caddy` de `apps/ansible/roles/` desde `platform/ansible/` (`ansible-playbook playbooks/clinica01.yml`). El rol toma los archivos de `apps/<vm>/caddy/` y abre en ufw los puertos de `caddy_puertos` desde `caddy_origenes`, que en clinica01 son el 443 desde la Interna en las dos familias (`inventarios/kit/host_vars/clinica01.yml`). El 80 no se abre.
 
 ## Cómo se verifica
 

@@ -1,20 +1,20 @@
 # DHIS2 en clinica01
 
-Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD (R6, D-06). DHIS2 y PostgreSQL/PostGIS corren en Docker Compose y Caddy los publica por HTTPS en `https://pacientes.salud.movil` ([`../caddy/`](../caddy/)).
+Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD. DHIS2 y PostgreSQL/PostGIS corren en Docker Compose y Caddy los publica por HTTPS en `https://pacientes.salud.movil` ([`../caddy/`](../caddy/)).
 
 | Archivo | Qué es |
 |---|---|
 | [`compose.yml`](compose.yml) | `postgis/postgis:16-3.5` (límite 2 GB) y `dhis2/core:2.42.6.0` (límite 4 GB, heap `-Xms1g -Xmx2g`), healthchecks, `restart: unless-stopped`, 60 s para cerrar al apagar la VM (`stop_grace_period`, así PostgreSQL cierra limpio en el apagado ordenado de platform#13) y DHIS2 solo en `127.0.0.1:8080`. PostgreSQL publica el 5432 solo en `10.20.20.11` y `[fd5a:fc7e:d716:20::11]` para los formularios y usa el `pg_hba.conf` que genera el rol. La red de Docker tiene subredes fijas (`172.30.0.0/24` y `fdc4:5a1d:7e20:1::/64`) con IPv6, así el 5432 publicado conserva la IP de origen en las dos familias |
 | [`dhis.conf`](dhis.conf) | Conexión a la base con `${DB_*}`, que DHIS2 toma de las variables de entorno, y `server.base.url = https://pacientes.salud.movil` con `server.https = on`. No lleva secretos |
-| [`prerregistro.sql`](prerregistro.sql) | Base `prerregistro` de los formularios (apps#6): tabla `prerregistros`, dueño `prerregistro_dueno` sin login, usuario `formularios` con solo `INSERT` y usuario `consultas` (apps#7) que lee y solo cambia `atendido` y `atendido_en`. Idempotente |
+| [`prerregistro.sql`](prerregistro.sql) | Base `prerregistro` de los formularios: tabla `prerregistros`, dueño `prerregistro_dueno` sin login, usuario `formularios` con solo `INSERT` y usuario `consultas` que lee y solo cambia `atendido` y `atendido_en`. Idempotente |
 | [`context.xml`](context.xml) | El `context.xml` de Tomcat de la imagen con `RemoteIpValve`, para que DHIS2 respete `X-Forwarded-Proto`, `X-Forwarded-Port` y `X-Forwarded-For` de Caddy. Sin él, DHIS2 redirige a `http://` |
 | [`metadatos/kit.json`](metadatos/kit.json) | Metadatos del kit con UID fijos (ver abajo) |
-| [`metadatos/pacientes-ficticios.json`](metadatos/pacientes-ficticios.json) | 20 pacientes ficticios (S-09) con su inscripción y una consulta |
-| [`metadatos/pacientes-demostracion.json`](metadatos/pacientes-demostracion.json) | 200 pacientes ficticios de demostración (`PacDemo0001` a `PacDemo0200`, documentos `DEMO-0001`…) con 300 consultas entre el 21 de septiembre y el 27 de octubre de 2026, para el dashboard de la brigada (apps#12) |
+| [`metadatos/pacientes-ficticios.json`](metadatos/pacientes-ficticios.json) | 20 pacientes ficticios con su inscripción y una consulta |
+| [`metadatos/pacientes-demostracion.json`](metadatos/pacientes-demostracion.json) | 200 pacientes ficticios de demostración (`PacDemo0001` a `PacDemo0200`, documentos `DEMO-0001`…) con 300 consultas entre el 21 de septiembre y el 27 de octubre de 2026, para el dashboard de la brigada |
 | [`metadatos/generar-demostracion.py`](metadatos/generar-demostracion.py) | Genera el archivo anterior con una semilla fija; ejecutarlo otra vez da el mismo archivo. No corre en la VM |
 | [`metadatos/brigada.json`](metadatos/brigada.json) | Indicadores de programa, visualizaciones y el dashboard "Brigada de salud", con UID fijos (ver abajo) |
 | [`.env.example`](.env.example) | Variables que lee Compose (`DATOS`, `DB_*`, las subredes `RED4`/`RED6` y las IP de publicación `IP4`/`IP6`). El `.env` real lo genera Ansible desde el inventario y el vault, con permisos `600` |
-| [`prueba-humo/`](prueba-humo/) | `carga.py` y `medir.sh` de la prueba de humo (apps#1) |
+| [`prueba-humo/`](prueba-humo/) | `carga.py` y `medir.sh` de la prueba de humo |
 
 ## Programa y cuentas
 
@@ -28,11 +28,11 @@ Aplicación de pacientes del kit, con cuentas locales para que no dependa de AD 
 | Roles | "Personal clínico" (apps Capture, Dashboard y Data Visualizer, registrar y actualizar pacientes, y ver la analítica de eventos) y "Administrador" (todas las autoridades) |
 | Cuentas | `admin` (superusuario de la imagen), `ana.rojas` y `carlos.perez` con "Personal clínico", `laura.gomez` con "Administrador". Las tres del personal están en el grupo y en la unidad del kit. `kit.json` define el grupo sin miembros, así que cada importación lo vacía y el rol vuelve a meter a cada cuenta |
 
-Las cuentas son locales de DHIS2 y no dependen de AD; tienen los mismos nombres que en el dominio para que sea fácil saber quién es quién. Las contraseñas están en el vault (`vault_dhis2_admin_password` y `vault_dhis2_usuarios_password`) y siguen la convención del grupo (R-14). La política de DHIS2 exige mayúscula, número y símbolo y rechaza palabras genéricas como `password` o `admin` (`Password must not have any generic word`), así que usa la clave alternativa de la convención.
+Las cuentas son locales de DHIS2 y no dependen de AD; tienen los mismos nombres que en el dominio para que sea fácil saber quién es quién. Las contraseñas están en el vault (`vault_dhis2_admin_password` y `vault_dhis2_usuarios_password`) y siguen la convención del grupo. La política de DHIS2 exige mayúscula, número y símbolo y rechaza palabras genéricas como `password` o `admin` (`Password must not have any generic word`), así que usa la clave alternativa de la convención.
 
 ## PostgreSQL y los formularios
 
-La misma instancia de PostgreSQL guarda DHIS2 y los prerregistros de los formularios de comunidad01 (D-07, F-11), en bases separadas. La consulta de prerregistros ([`../consultas/`](../consultas/)) los lee desde la propia clinica01. `pg_hba.conf` (plantilla `pg_hba.conf.j2` del rol) rechaza todo lo que no está en esta tabla.
+La misma instancia de PostgreSQL guarda DHIS2 y los prerregistros de los formularios de comunidad01, en bases separadas. La consulta de prerregistros ([`../consultas/`](../consultas/)) los lee desde la propia clinica01. `pg_hba.conf` (plantilla `pg_hba.conf.j2` del rol) rechaza todo lo que no está en esta tabla.
 
 | Base | Usuario | Desde | Para qué |
 |---|---|---|---|
@@ -65,9 +65,9 @@ ansible-playbook playbooks/clinica01.yml -e dhis2_estado=stopped  # docker compo
   - Crea la base `prerregistro`, su tabla y sus roles con `prerregistro.sql` si el archivo cambió o falta la base. Las claves de `formularios` y `consultas` salen del vault (`vault_formularios_db_password` y `vault_consultas_db_password`).
 - **Cambio de la red de Docker.** Si cambian las subredes, Compose no puede recrear la red con los contenedores encima: antes hay que `docker compose down` en `/srv/dhis2` (los datos quedan).
 
-Docker y Compose vienen de los paquetes de Ubuntu (`docker.io` 29.1.3 y `docker-compose-v2` 2.40.3), retenidos con `hold`. Las imágenes se descargan por F-17 (las VMs salen a Internet por 80 y 443, solo IPv4).
+Docker y Compose vienen de los paquetes de Ubuntu (`docker.io` 29.1.3 y `docker-compose-v2` 2.40.3), retenidos con `hold`. Las imágenes se descargan de Internet (las VMs salen a Internet por 80 y 443, solo IPv4).
 
-## Dashboard de la brigada (apps#12)
+## Dashboard de la brigada
 
 El dashboard **Brigada de salud** muestra cómo va la jornada. Lo ve el grupo "Personal clínico" desde la app Dashboard, y cada elemento se puede abrir en Data Visualizer.
 
@@ -95,11 +95,11 @@ Los periodos relativos de DHIS2 no incluyen el periodo en curso (`LAST_12_WEEKS`
 | Atenciones de 0 a 4, 5 a 14, 15 a 49 y 50 años o más (`PiEdad*`) | `d2:yearsBetween` entre la fecha de nacimiento y la de la consulta |
 | Motivo: control o revisión, fiebre o malestar, dolor, embarazo, vacunación u otro (`PiMot*`) | Motivo principal |
 
-**Tablas analíticas (R-03).** El trabajo **Tablas analíticas de la brigada** (`TrabAnalit1`, `CONTINUOUS_ANALYTICS_TABLE`) recalcula el periodo más reciente cada 30 minutos y todas las tablas a las 2:00, así que el dashboard va como mucho media hora atrás. Usa `skipOutliers: true` porque el kit no tiene datos agregados. Con 221 pacientes y 321 consultas, la generación completa tardó 4,6 s y dejó a `core` en 1861 MiB de 4096 y a `db` en 140 MiB de 2048. Una pasada del trabajo continuo tardó 3,9 s con picos de 1900 y 165 MiB. Bajo demanda se generan desde la app Data Administration o con `POST /api/resourceTables/analytics`.
+**Tablas analíticas.** El trabajo **Tablas analíticas de la brigada** (`TrabAnalit1`, `CONTINUOUS_ANALYTICS_TABLE`) recalcula el periodo más reciente cada 30 minutos y todas las tablas a las 2:00, así que el dashboard va como mucho media hora atrás. Usa `skipOutliers: true` porque el kit no tiene datos agregados. Con 221 pacientes y 321 consultas, la generación completa tardó 4,6 s y dejó a `core` en 1861 MiB de 4096 y a `db` en 140 MiB de 2048. Una pasada del trabajo continuo tardó 3,9 s con picos de 1900 y 165 MiB. Bajo demanda se generan desde la app Data Administration o con `POST /api/resourceTables/analytics`.
 
 ## Cómo se accede
 
-Desde la Interna, en `https://pacientes.salud.movil` (F-05). El certificado lo firma la CA del kit; para que el navegador no muestre la advertencia se instala la raíz desde `http://ca.salud.movil`. La app para registrar pacientes es **Capture**.
+Desde la Interna, en `https://pacientes.salud.movil`. El certificado lo firma la CA del kit; para que el navegador no muestre la advertencia se instala la raíz desde `http://ca.salud.movil`. La app para registrar pacientes es **Capture**.
 
 Desde la máquina propia, con un túnel a través de kit01 y una línea en `/etc/hosts`. DHIS2 conserva el puerto del túnel en sus redirecciones.
 
@@ -109,7 +109,7 @@ echo '127.0.0.1 pacientes.salud.movil' | sudo tee -a /etc/hosts
 # después, https://pacientes.salud.movil:8443
 ```
 
-## Prueba de humo (R-03)
+## Prueba de humo
 
 Resultados completos en apps#1. Con 5 usuarios registrando 2000 pacientes a la vez, DHIS2 llegó a 1,66 GiB y PostgreSQL a 322 MiB. En reposo usan 1,51 GiB y 137 MiB. El primer arranque tarda 57 s y un reinicio con datos 25 s.
 
@@ -135,7 +135,7 @@ kill %1
 | `ana.rojas` registra una consulta hoy, `POST /api/jobConfigurations/TrabAnalit1/execute` y `GET /api/analytics?dimension=dx:PiAtenTot01&filter=pe:TODAY&filter=ou:KitSalud001` | Sube en 1 |
 | En `https://pacientes.salud.movil`, como `ana.rojas`, la app Dashboard | **Brigada de salud** con sus 8 elementos y datos |
 | Desde la Interna, `curl -4` y `curl -6 --cacert <raíz> https://pacientes.salud.movil/` | `302` hacia `https://pacientes.salud.movil/dhis-web-login/` |
-| Como `ana.rojas`, `POST /api/tracker?async=false` con un paciente y `GET /api/tracker/trackedEntities?...&filter=AtrDocumen1:eq:<documento>` (P6) | `status OK` y el paciente con `createdBy` `ana.rojas` |
+| Como `ana.rojas`, `POST /api/tracker?async=false` con un paciente y `GET /api/tracker/trackedEntities?...&filter=AtrDocumen1:eq:<documento>` | `status OK` y el paciente con `createdBy` `ana.rojas` |
 | `cd /srv/dhis2 && sudo docker compose down && sudo docker compose up -d` y otra vez el conteo | El mismo número de pacientes |
 | `sudo docker exec dhis2-db-1 psql -U dhis -d prerregistro -c '\dp prerregistros'` | `formularios=a/prerregistro_dueno` y `consultas=r/prerregistro_dueno`, con `atendido` y `atendido_en` en `consultas=w` por columna |
 | En clinica01, `sudo docker run --rm -it --network host postgis/postgis:16-3.5 psql "host=10.20.20.11 dbname=prerregistro user=consultas"` (y con `fd5a:fc7e:d716:20::11`) con `SELECT`, `UPDATE` de `atendido` (con `ROLLBACK`), `INSERT`, `UPDATE` de otra columna y `DELETE` | El `SELECT` y el `UPDATE` de `atendido` funcionan; los otros dan `permission denied`. `inet_client_addr()` es la IP de clinica01 |
@@ -149,7 +149,7 @@ kill %1
 
 - **`core` se queda en `health: starting`.** El primer arranque tarda alrededor de un minuto y el healthcheck espera hasta 10 minutos. `sudo docker logs -f dhis2-core-1` muestra el avance hasta `Server startup in`.
 - **`core` no conecta con la base.** Revisar que `.env` tenga `DB_PASSWORD` y que `db` esté `healthy`. Si se cambió la contraseña después de crear la base, PostgreSQL conserva la anterior; hay que cambiarla también dentro de la base.
-- **No descarga las imágenes.** Revisar la salida a Internet de las VMs (F-17) y el DNS (`resolvectl query registry-1.docker.io`).
+- **No descarga las imágenes.** Revisar la salida a Internet de las VMs y el DNS (`resolvectl query registry-1.docker.io`).
 - **`no pg_hba.conf entry` o `pg_hba.conf rejects connection`.** El origen, la base o el usuario no están en `pg_hba.conf`. `sudo docker exec dhis2-db-1 psql -U dhis -d dhis2 -c 'select * from pg_hba_file_rules'` muestra las reglas cargadas.
 - **El 5432 por IPv6 llega con la IP de la red de Docker.** La red no tiene IPv6 (`docker network inspect dhis2_default`) y Docker usa su proxy, que cambia el origen.
 - **El rol falla al cambiar la clave de fábrica de `admin` con `401` justo después de reiniciar `db`.** DHIS2 todavía no había recuperado sus conexiones. El rol ya espera a `/api/me`; si pasa igual, se vuelve a ejecutar el playbook.

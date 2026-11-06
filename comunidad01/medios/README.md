@@ -1,6 +1,6 @@
 # Carpeta de medios de comunidad01
 
-`/srv/medios/` guarda lo que sirven Kiwix y Jellyfin. Lo que sube el personal llega desde el recurso SMB `contenido` de clinica01 por la publicación (R9, sección 10.5, F-12), que corre en clinica01 ([`platform/clinica01/publicacion/`](https://github.com/kitsalud-movil-plats1/platform/tree/main/clinica01/publicacion)). Lo prepara el rol `publicacion_destino` de [`../../ansible/roles/`](../../ansible/roles/), que se aplica con `playbooks/publicacion.yml` de `platform/ansible`.
+`/srv/medios/` guarda lo que sirven Kiwix y Jellyfin. Lo que sube el personal llega desde el recurso SMB `contenido` de clinica01 por la publicación, que corre en clinica01 ([`platform/clinica01/publicacion/`](https://github.com/kitsalud-movil-plats1/platform/tree/main/clinica01/publicacion)). Lo prepara el rol `publicacion_destino` de [`../../ansible/roles/`](../../ansible/roles/), que se aplica con `playbooks/publicacion.yml` de `platform/ansible`.
 
 | Carpeta | Qué guarda | Dueño |
 |---|---|---|
@@ -17,11 +17,11 @@ Los roles `kiwix` y `jellyfin` crean `zim/` y las carpetas de las bibliotecas si
 | Usuario | `publicacion`, de sistema, sin contraseña (`!`), con `/bin/sh` para que sshd ejecute el comando forzado. Su home es `/etc/kitsalud/publicacion`, de root, donde no puede escribir |
 | Llave autorizada | `/etc/ssh/publicacion/authorized_keys`, de root, con la llave pública de clinica01 y `command="rsync --server --daemon --config=/etc/kitsalud/publicacion/rsyncd.conf .",restrict,from="10.20.20.11,fd5a:fc7e:d716:20::11"` |
 | sshd | `/etc/ssh/sshd_config.d/20-publicacion.conf`. Desde las IP de clinica01 solo entra `publicacion` (`AllowUsers`). `publicacion` solo entra con su llave, con el mismo comando forzado, sin PTY, túneles ni reenvíos |
-| ufw | `22/tcp` desde `10.20.20.11` y `fd5a:fc7e:d716:20::11` (comentario `publicacion`, F-12), además del SSH de kit01 |
+| ufw | `22/tcp` desde `10.20.20.11` y `fd5a:fc7e:d716:20::11` (comentario `publicacion`), además del SSH de kit01 |
 | Demonio de rsync | `/etc/kitsalud/publicacion/rsyncd.conf`. Lo lanza sshd por cada conexión y corre como `publicacion`. Sin chroot y con `munge symlinks`, así que un enlace simbólico que llegue no apunta a nada. Módulos `write only` (no se puede leer nada) y `list = no`. Lo que llega queda con `644` y las carpetas con `755`, legibles para Jellyfin y Kiwix. Registra en syslog con la etiqueta `publicacion`, que llega al log central de kit01 |
 | Protección de los medios del rol | El módulo `videos` excluye lo que anota el rol `jellyfin` en `/srv/jellyfin/medios-del-rol.txt` y su temporal `.preparando.mp4`. Un archivo excluido por el demonio no se recibe ni se borra, así que `--delete` no lo toca |
 
-comunidad01 no tiene credenciales hacia clinica01 para este flujo. No guarda llaves ni claves SMB, y ufw en clinica01 solo deja entrar el 22 desde kit01 y el 445 desde la Interna. La única credencial de comunidad01 hacia clinica01 es el usuario `formularios` de PostgreSQL, que solo puede hacer `INSERT` (F-11, D-07).
+comunidad01 no tiene credenciales hacia clinica01 para este flujo. No guarda llaves ni claves SMB, y ufw en clinica01 solo deja entrar el 22 desde kit01 y el 445 desde la Interna. La única credencial de comunidad01 hacia clinica01 es el usuario `formularios` de PostgreSQL, que solo puede hacer `INSERT`.
 
 ## Reindexado
 

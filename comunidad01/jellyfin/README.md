@@ -1,6 +1,6 @@
 # Jellyfin en comunidad01
 
-Audio y video para la sala de espera (R7, D-08, sección 10.5). Hay dos bibliotecas: **Salud**, con contenido médico general, y **Comunidad**, con material educativo y para niños. La comunidad entra con el usuario `comunidad` y la contraseña vacía. Todo se reproduce directo, sin transcodificar, y la administración solo se puede hacer desde la Interna y por NetBird. Caddy lo publica en `http://videos.salud.movil` ([`../caddy/`](../caddy/)).
+Audio y video para la sala de espera. Hay dos bibliotecas: **Salud**, con contenido médico general, y **Comunidad**, con material educativo y para niños. La comunidad entra con el usuario `comunidad` y la contraseña vacía. Todo se reproduce directo, sin transcodificar, y la administración solo se puede hacer desde la Interna y por NetBird. Caddy lo publica en `http://videos.salud.movil` ([`../caddy/`](../caddy/)).
 
 | Archivo | Qué es |
 |---|---|
@@ -14,7 +14,7 @@ El rol `jellyfin` de `apps/ansible/roles/` hace el resto por la API local (`127.
 |---|---|---|
 | Dirección de escucha | `127.0.0.1:8096` | Solo Caddy llega a Jellyfin |
 | Proxy de confianza | `127.0.0.1` | Jellyfin toma la IP del cliente de `X-Forwarded-For`. Caddy la reemplaza siempre, así que un cliente no la puede falsear |
-| Redes locales | La Interna (`10.20.10.0/24` y `fd5a:fc7e:d716:10::/64`) y kit01 (`10.20.20.1`, `.10`, `::1` y `::10`) | kit01 es el origen de la administración por NetBird con túnel (D-18) |
+| Redes locales | La Interna (`10.20.10.0/24` y `fd5a:fc7e:d716:10::/64`) y kit01 (`10.20.20.1`, `.10`, `::1` y `::10`) | kit01 es el origen de la administración por NetBird con túnel |
 | Acceso remoto | Activado | La Comunidad llega enrutada, sin NAT, con su IP `10.20.40.x`, y para Jellyfin es remota |
 | Descubrimiento y UPnP | Apagados | No escucha en el UDP 7359 ni abre puertos en el router |
 
@@ -25,11 +25,11 @@ El rol `jellyfin` de `apps/ansible/roles/` hace el resto por la API local (`127.
 | Salud | `/srv/medios/videos/salud` | `mixed` (audio y video) |
 | Comunidad | `/srv/medios/videos/comunidad` | `mixed` |
 
-Las bibliotecas no buscan metadatos ni imágenes en Internet (C-03) y no extraen capítulos ni miniaturas, que cargarían la CPU. El título de cada ítem sale del nombre del archivo, o de las etiquetas en los MP3.
+Las bibliotecas no buscan metadatos ni imágenes en Internet y no extraen capítulos ni miniaturas, que cargarían la CPU. El título de cada ítem sale del nombre del archivo, o de las etiquetas en los MP3.
 
 | Cuenta | Contraseña | Política |
 |---|---|---|
-| `admin` | En el vault (`vault_jellyfin_admin_password`), según la convención del grupo (R-14) | Administrador, oculta en la pantalla de entrada y sin acceso remoto, así que solo entra desde las redes locales |
+| `admin` | En el vault (`vault_jellyfin_admin_password`), según la convención del grupo | Administrador, oculta en la pantalla de entrada y sin acceso remoto, así que solo entra desde las redes locales |
 | `comunidad` | Vacía | Visible en la pantalla de entrada: se toca «comunidad» y después «Iniciar sesión», sin escribir nada. Solo reproduce: sin transcodificación de video ni de audio, sin remux, sin descargas, sin borrar y sin cambiar preferencias |
 
 La pantalla de entrada no tiene Quick Connect ni «Contraseña olvidada», que no sirven en el kit (Quick Connect está apagado en el servidor y el botón se oculta con el CSS de la marca), y muestra el aviso «Toque «comunidad» y después «Iniciar sesión», sin escribir contraseña».
@@ -38,7 +38,7 @@ Desde la Comunidad, `admin` recibe `403` y el log de Jellyfin dice `remote acces
 
 ## Material y cómo se agrega más
 
-La lista está en `platform/ansible/inventarios/kit/group_vars/all/contenido.yml` (`contenido_medios`), con la URL, el sha256, el autor y la licencia de cada archivo. El rol lo descarga en base (R-05) solo si falta o no coincide. Si un archivo viene en otro formato (`preparar: true`), el rol lo convierte una sola vez en comunidad01, con el `ffmpeg` de la imagen de Jellyfin, a H.264 Main y AAC estéreo en MP4, de 480p como mucho y unos 1 Mb/s (10.1). El original queda en `/srv/medios/originales`, fuera de las bibliotecas, y el MP4 se escribe con otro nombre y se renombra al final, para que Jellyfin no vea un archivo a medias.
+La lista está en `platform/ansible/inventarios/kit/group_vars/all/contenido.yml` (`contenido_medios`), con la URL, el sha256, el autor y la licencia de cada archivo. El rol lo descarga en base solo si falta o no coincide. Si un archivo viene en otro formato (`preparar: true`), el rol lo convierte una sola vez en comunidad01, con el `ffmpeg` de la imagen de Jellyfin, a H.264 Main y AAC estéreo en MP4, de 480p como mucho y unos 1 Mb/s (10.1). El original queda en `/srv/medios/originales`, fuera de las bibliotecas, y el MP4 se escribe con otro nombre y se renombra al final, para que Jellyfin no vea un archivo a medias.
 
 | Biblioteca | Archivo | Autor y licencia | Duración |
 |---|---|---|---|
@@ -77,7 +77,7 @@ Desde `platform/ansible/`, con `ansible-playbook playbooks/comunidad01.yml`. El 
 4. Si el asistente inicial no se ha hecho, lo completa (español, Colombia y la cuenta `admin`).
 5. Entra como `admin` y aplica la red, Quick Connect apagado, el aviso y el CSS de la pantalla de entrada, las bibliotecas que falten, la cuenta `comunidad` y las políticas. Cada ajuste solo se guarda si difiere del rol. Si cambia la red, reinicia el contenedor al final.
 
-La imagen y el material se descargan por F-17 (en base). La primera vez, con los 6 videos para preparar, el playbook tardó unos 10 minutos.
+La imagen y el material se descargan de Internet (en la base). La primera vez, con los 6 videos para preparar, el playbook tardó unos 10 minutos.
 
 ## Cómo se ve desde la máquina propia
 

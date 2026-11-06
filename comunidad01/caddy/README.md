@@ -6,7 +6,7 @@ Proxy inverso de comunidad01 (D-16). Publica el contenido de la comunidad por no
 |---|---|
 | [`compose.yml`](compose.yml) | `caddy:2.11.7` con la red del host (`network_mode: host`), límite de 256 MB y `restart: unless-stopped`. Monta la carpeta `conf/` y no el archivo, para que una recarga vea el Caddyfile nuevo, `pki/` en `/pki` y `publica/` en `/srv/publica` |
 | [`Caddyfile`](Caddyfile) | La CA `local` con la raíz (solo el certificado) y el intermedio de comunidad01, que solo vale para `registro`, y un bloque por nombre de servicio |
-| [`publica/index.html`](publica/index.html), `estilo.css` y `fuentes/` | Página con las instrucciones para instalar la raíz en Android, iPhone, Windows y Linux, con la apariencia común de las páginas del kit y sus fuentes incluidas (Atkinson Hyperlegible Next, licencia OFL en `fuentes/OFL.txt`). El rol `ca_interna` deja `raiz.crt` al lado |
+| [`publica/index.html`](publica/index.html), `estilo.css`, `fondo.svg`, `fuentes/` e `ilustraciones/` | Página con las instrucciones para instalar la raíz en Android, iPhone, Windows y Linux, con la apariencia común de las páginas del kit y sus fuentes incluidas (Lexend, licencia OFL en `fuentes/OFL.txt`) y su ilustración. El rol `ca_interna` deja `raiz.crt` al lado |
 
 | Nombre | Destino | Protocolo |
 |---|---|---|

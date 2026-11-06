@@ -1,33 +1,27 @@
 /* Apariencia común de las páginas del kit (portal, prerregistro, consulta y
-   certificado). La paleta sigue el sistema de diseño del servicio de salud del
-   Reino Unido (service-manual.nhs.uk), con contraste AA. La fuente va junto a
-   este archivo, en fuentes/, para que todo se vea igual sin Internet. Licencia
-   SIL OFL 1.1 en fuentes/OFL.txt */
+   certificado). Fondo lavanda, una tarjeta blanca como pantalla, ilustraciones
+   de línea, campos en forma de píldora y botones con contorno. La fuente va
+   junto a este archivo, en fuentes/, para que todo se vea igual sin Internet.
+   Licencia SIL OFL 1.1 en fuentes/OFL.txt */
 @font-face {
-  font-family: "Atkinson Hyperlegible Next";
-  src: url("fuentes/atkinson-hyperlegible-next.woff2") format("woff2");
-  font-weight: 200 800;
+  font-family: "Lexend";
+  src: url("fuentes/lexend.woff2") format("woff2");
+  font-weight: 100 900;
   font-display: swap;
 }
 
 :root {
-  --tinta: #212b32;
-  --gris: #4c6272;
-  --azul: #005eb8;
-  --azul-hondo: #003087;
-  --azul-suave: #e6f0fa;
-  --verde: #007f3b;
-  --verde-hondo: #006230;
-  --verde-suave: #e5f3eb;
-  --fondo: #f0f4f5;
+  --tinta: #1b1a55;
+  --gris: #55577a;
+  --lila: #7a7fd1;
+  --lila-hondo: #464bb0;
+  --lavanda: #b3bcea;
+  --pildora: #f1f1f8;
   --blanco: #ffffff;
-  --borde: #d8dde0;
-  --borde-campo: #8b9aa5;
-  --rojo: #d5281b;
-  --rojo-suave: #fdecea;
-  --foco: #ffeb3b;
-  --sombra: 0 1px 2px rgba(33, 43, 50, .06), 0 8px 24px rgba(33, 43, 50, .08);
-  --fuente: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --rojo: #b3261e;
+  --rojo-suave: #fcecea;
+  --ancho: 30rem;
+  --fuente: "Lexend", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -35,135 +29,126 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   font-family: var(--fuente);
-  font-size: 1.125rem;
-  line-height: 1.55;
+  font-size: 1.0625rem;
+  font-weight: 300;
+  line-height: 1.6;
   color: var(--tinta);
-  background: var(--fondo);
-  -webkit-font-smoothing: antialiased;
+  background: var(--lavanda) url("fondo.svg") center / cover fixed no-repeat;
 }
 
-/* Encabezado en degradado; el contenido se monta encima en un panel */
+/* La barra y el contenido forman una sola tarjeta blanca */
+.barra, main {
+  width: min(calc(100% - 1.5rem), var(--ancho));
+  margin-inline: auto;
+  background: var(--blanco);
+}
 .barra {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: .6rem 1rem;
-  padding: 1rem 1.25rem 4.5rem;
-  color: var(--blanco);
-  background: linear-gradient(135deg, #0072ce 0%, var(--azul) 45%, var(--azul-hondo) 100%);
+  gap: .5rem 1rem;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+  padding: 1.1rem 1.6rem .3rem;
+  border-radius: 10px 10px 0 0;
 }
+main {
+  margin-bottom: 2.5rem;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 24px 48px rgba(70, 75, 176, .28);
+}
+.panel { padding: 1rem 1.6rem 2.2rem; }
 .marca {
   display: flex;
   align-items: center;
-  gap: .65rem;
+  gap: .55rem;
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -.01em;
-  color: inherit;
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--gris);
   text-decoration: none;
 }
-.marca svg { width: 2.1rem; height: 2.1rem; flex: none; }
+.marca svg { width: 1.5rem; height: 1.5rem; flex: none; }
 
-main { max-width: 38rem; margin: -3.4rem auto 0; padding: 0 1rem 3.5rem; }
-.panel {
-  padding: 1.6rem 1.35rem 1.8rem;
-  background: var(--blanco);
-  border-radius: 20px;
-  box-shadow: var(--sombra);
-}
-
-h1, h2 { color: var(--tinta); line-height: 1.15; letter-spacing: -.025em; }
-h1 { font-size: 2.05rem; font-weight: 800; margin: 0 0 .7rem; }
-h2 { font-size: 1.35rem; font-weight: 800; margin: 2rem 0 .6rem; }
+h1, h2 { color: var(--tinta); line-height: 1.15; }
+h1 { font-size: 2.3rem; font-weight: 600; letter-spacing: -.02em; margin: .6rem 0 1rem; }
+h1 .saludo { display: block; font-size: .78em; font-weight: 300; letter-spacing: -.01em; }
+h2 { font-size: 1.2rem; font-weight: 600; margin: 1.8rem 0 .7rem; }
 p { margin: .6rem 0; }
-.entrada { font-size: 1.2rem; color: var(--gris); }
-.nota { color: var(--gris); font-size: 1rem; }
-a { color: var(--azul); font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: .2em; }
-a:hover { color: var(--azul-hondo); text-decoration-thickness: 2px; }
+.entrada { color: var(--gris); text-align: center; }
+.nota { color: var(--gris); font-size: .95rem; }
+.ilustracion { display: block; width: min(100%, 15rem); height: auto; margin: 1.1rem auto; }
+a { color: var(--lila-hondo); font-weight: 500; text-underline-offset: .2em; }
+a:hover { color: var(--tinta); }
 
-/* Foco visible: anillo amarillo y borde oscuro */
-a:focus-visible, button:focus-visible, .boton:focus-visible, summary:focus-visible {
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid var(--tinta);
   outline-offset: 2px;
-  box-shadow: 0 0 0 7px var(--foco);
-}
-input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: none;
-  border-color: var(--tinta);
-  box-shadow: 0 0 0 4px var(--foco);
 }
 
-.hoja {
-  margin: 1rem 0;
-  padding: 1.2rem 1.3rem;
-  background: var(--blanco);
-  border-radius: 16px;
-  box-shadow: var(--sombra);
-}
+.hoja { margin: 1rem 0; padding: 1.1rem 1.3rem; background: var(--pildora); border-radius: 22px; }
 
+/* Botón con contorno, como una píldora */
 button, .boton {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: .6rem;
-  width: 100%;
-  min-height: 3.4rem;
-  margin: 1.5rem 0 0;
-  padding: .85rem 1.3rem;
+  gap: .55rem;
+  width: fit-content;
+  min-width: 11rem;
+  min-height: 3.2rem;
+  margin: 1.8rem auto 0;
+  padding: .6rem 2rem;
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.15rem;
-  color: var(--blanco);
-  background: var(--verde);
-  border: 2px solid transparent;
-  border-radius: 14px;
-  box-shadow: 0 1px 2px rgba(0, 64, 30, .2), 0 6px 16px rgba(0, 127, 59, .25);
+  color: var(--tinta);
+  background: var(--blanco);
+  border: 2px solid var(--tinta);
+  border-radius: 999px;
+  text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: background .15s, transform .1s;
+  transition: background .15s, color .15s;
 }
-button:hover, .boton:hover { color: var(--blanco); background: var(--verde-hondo); }
-button:active, .boton:active { transform: scale(.98); }
-.boton svg, button svg { width: 1.35rem; height: 1.35rem; flex: none; }
-button.secundario, .boton.secundario {
-  color: var(--azul);
-  background: var(--blanco);
-  border-color: var(--borde);
-  box-shadow: none;
-}
-button.secundario:hover, .boton.secundario:hover { color: var(--azul-hondo); background: var(--azul-suave); border-color: var(--azul); }
+button:hover, .boton:hover { color: var(--blanco); background: var(--tinta); }
+.boton svg, button svg { width: 1.3rem; height: 1.3rem; flex: none; }
+button.secundario, .boton.secundario { font-size: 1rem; border-color: var(--lila); }
+button.secundario:hover, .boton.secundario:hover { color: var(--tinta); background: var(--pildora); }
 
-label { display: block; margin-top: 1.3rem; font-weight: 700; }
+label { display: block; margin-top: 1.2rem; font-weight: 500; }
 input, select, textarea {
   display: block;
   width: 100%;
-  margin-top: .4rem;
-  padding: .75rem .9rem;
+  margin-top: .35rem;
+  padding: .7rem 1.2rem;
   font: inherit;
+  font-weight: 400;
   color: var(--tinta);
-  background: var(--blanco);
-  border: 2px solid var(--borde-campo);
-  border-radius: 12px;
-  transition: border-color .15s, box-shadow .15s;
+  background: var(--pildora);
+  border: 1.5px solid var(--lila);
+  border-radius: 999px;
 }
-textarea { resize: vertical; }
-[aria-invalid="true"] { border-color: var(--rojo); background: var(--rojo-suave); }
-.error { display: flex; gap: .4rem; color: var(--rojo); font-weight: 700; margin: .4rem 0 0; }
+textarea { border-radius: 22px; resize: vertical; }
+[aria-invalid="true"] { border: 2px solid var(--rojo); background: var(--rojo-suave); }
+.error { color: var(--rojo); font-weight: 500; margin: .35rem 0 0 1.2rem; }
 .aviso {
-  margin: 1.2rem 0;
-  padding: .95rem 1.1rem;
-  font-weight: 700;
-  color: #8a1a11;
+  margin: 1.1rem 0;
+  padding: .85rem 1.2rem;
+  font-weight: 500;
+  color: var(--rojo);
   background: var(--rojo-suave);
-  border-radius: 12px;
+  border-radius: 22px;
 }
 .vacio { color: var(--gris); }
 
 /* Certificado del kit */
-main { max-width: 44rem; }
-.pasos { margin: .4rem 0 0; padding-left: 1.4rem; }
-.pasos li { margin: .5rem 0; padding-left: .2rem; }
-code { padding: .1rem .4rem; font-size: .95em; background: var(--fondo); border-radius: 6px; overflow-wrap: anywhere; }
+:root { --ancho: 40rem; }
+.boton { padding-inline: 1.2rem; font-size: 1.05rem; white-space: nowrap; }
+.pasos { margin: .3rem 0 0; padding-left: 1.3rem; }
+.pasos li { margin: .4rem 0; padding-left: .2rem; }
+b { font-weight: 500; }
+code { padding: .05rem .4rem; font-size: .92em; background: var(--blanco); border-radius: 8px; overflow-wrap: anywhere; }
 .hoja h2 { margin-top: 0; }

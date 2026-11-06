@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block titulo %}Entrar{% endblock %}
+{% block cuerpo %}angosta{% endblock %}
 {% block contenido %}
-<div class="angosto panel">
-<h1>Consulta de prerregistros</h1>
+<h1><span class="saludo">Consulta de</span> prerregistros</h1>
+<img class="ilustracion" src="{{ url_for('static', filename='ilustraciones/llave.svg') }}" alt="">
 <p class="entrada">Entre con su usuario y contraseña del kit. Solo el personal clínico puede ver los prerregistros.</p>
 
 {% if error %}<p class="aviso" role="alert">{{ error }}</p>{% endif %}
@@ -17,5 +18,4 @@
 
   <button type="submit">Entrar</button>
 </form>
-</div>
 {% endblock %}

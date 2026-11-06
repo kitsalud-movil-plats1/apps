@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% macro error(campo) %}{% if errores.get(campo) %}<p class="error" id="error-{{ campo }}">{{ errores[campo] }}</p>{% endif %}{% endmacro %}
 {% block contenido %}
-<h1>Prerregistro para la consulta</h1>
+<h1><span class="saludo">Prerregistro</span> para la consulta</h1>
+<img class="ilustracion" src="{{ url_for('static', filename='ilustraciones/formulario.svg') }}" alt="">
 <p class="entrada">Llene estos datos mientras espera. Así el personal de salud lo atiende más rápido. Si necesita ayuda, pídala al personal.</p>
 
 {% if aviso %}<p class="aviso" role="alert">{{ aviso }}</p>{% endif %}

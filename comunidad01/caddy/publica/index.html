@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/estilo.css">
 </head>
 <body>
-<header class="barra"><p class="marca"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="9" fill="#fff"/><path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z" fill="#005eb8"/></svg> Kit de salud móvil</p></header>
+<header class="barra"><p class="marca"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="9" fill="#7a7fd1"/><path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z" fill="#fff"/></svg> Kit de salud móvil</p></header>
 <main>
 <div class="panel">
-<h1>Certificado del kit de salud</h1>
+<h1><span class="saludo">Certificado</span> del kit de salud</h1>
+<img class="ilustracion" src="/ilustraciones/certificado.svg" alt="">
 <p class="entrada">Las páginas del kit que manejan datos (registro de pacientes y prerregistro) usan HTTPS con un certificado propio del kit. Si instala este certificado una vez, el navegador deja de mostrar la advertencia de seguridad.</p>
 <p><a class="boton" href="/raiz.crt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg>Descargar el certificado</a></p>
-</div>
 
 <section class="hoja">
 <h2>Android</h2>
@@ -46,6 +46,7 @@
 <h2>Linux</h2>
 <p><code>sudo cp raiz.crt /usr/local/share/ca-certificates/kit-salud.crt &amp;&amp; sudo update-ca-certificates</code></p>
 </section>
+</div>
 </main>
 </body>
 </html>

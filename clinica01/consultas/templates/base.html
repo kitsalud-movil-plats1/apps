@@ -6,9 +6,9 @@
 <title>{% block titulo %}Prerregistros{% endblock %} · Kit de salud</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
-<body>
+<body class="{% block cuerpo %}{% endblock %}">
 <header class="barra">
-  <p class="marca"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="9" fill="#fff"/><path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z" fill="#005eb8"/></svg> Prerregistros de la brigada</p>
+  <p class="marca"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="9" fill="#7a7fd1"/><path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z" fill="#fff"/></svg> Prerregistros de la brigada</p>
   {% if usuario %}
   <form method="post" action="/salir" class="salir">
     <span>{{ nombre }}</span>
@@ -18,7 +18,9 @@
   {% endif %}
 </header>
 <main>
+<div class="panel">
 {% block contenido %}{% endblock %}
+</div>
 </main>
 </body>
 </html>
